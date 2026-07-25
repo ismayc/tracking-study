@@ -118,14 +118,14 @@ Across 210 player-games, for the 120 with 20+ live minutes:
 | Average speed | **6.22 ft/s** (4.24 mph) |
 | 95th-percentile speed | **14.8 ft/s** (10.1 mph) |
 
-### B. Spacing — the offense occupies a median 531 sq ft
+### B. Spacing — the offense occupies a median 529 sq ft
 
-Convex hull area of the five offensive players, over 116,805 sampled frames:
+Convex hull area of the five offensive players, over 116,801 sampled frames:
 
 | Statistic | Value |
 |---|---|
-| Median | **531 sq ft** |
-| IQR | **372 – 709 sq ft** |
+| Median | **529 sq ft** |
+| IQR | **370 – 708 sq ft** |
 
 The distribution is strongly right-skewed. For scale, a half court is 47 × 50 =
 2,350 sq ft, so the offense typically occupies only **about a fifth of the half
