@@ -3,8 +3,9 @@
 Two questions:
 
   A. Workload — how far and how fast do players actually move during live play?
-     Includes an external validation check against the NBA's published figure of
-     roughly 2.5 miles per game for a starter.
+     Validated externally by 04_validate.py against the NBA's own published
+     SpeedDistance aggregates for 2015-16 (median ~2.0 miles per game for
+     players with 20+ minutes).
 
   B. Spacing — how much floor does the offense occupy, and does occupying more of
      it coincide with better shots? Spacing is measured as the convex hull area of
@@ -143,7 +144,11 @@ def possession_frames(mom: pl.DataFrame) -> pl.DataFrame:
                .select("period", "game_clock",
                        pl.col("team_id").alias("off_team_id"),
                        pl.col("ball_dist").alias("handler_dist")))
-    return nearest
+    # Sort into game order before returning: group_by row order is otherwise
+    # nondeterministic, and spacing_by_frame subsamples every Nth ROW — an
+    # unsorted frame would make the subsample (and the spacing numbers) vary
+    # from run to run.
+    return nearest.sort(["period", "game_clock"], descending=[False, True])
 
 
 def hull_area(xs: np.ndarray, ys: np.ndarray) -> float:
