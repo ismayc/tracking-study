@@ -1,0 +1,4 @@
+metric,local,official,diff,tolerance,status
+median distance per game (miles),1.9969845994227495,2.0,-0.003015400577250471,0.15,PASS
+median minutes per game,27.642750000000007,28.05,-0.4072499999999941,2.0,PASS
+median average speed (mph),4.2405417349115275,4.23,0.0105417349115271,0.25,PASS
