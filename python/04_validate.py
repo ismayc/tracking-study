@@ -33,37 +33,50 @@ MIN_MINUTES = 20
 FT_PER_S_TO_MPH = 0.681818
 
 
-def official() -> pl.DataFrame:
+def official_medians() -> tuple[dict, int]:
+    """Medians of the published reference table (all the check uses), cached
+    after the first successful fetch so the gate keeps working when
+    stats.nba.com is unreachable (it rate-limits aggressively after heavy
+    use). The reference is a frozen 2015-16 aggregate - the cache cannot go
+    stale; delete data/official_speeddistance_medians.parquet to force a
+    re-fetch."""
+    cache = ROOT / "data" / "official_speeddistance_medians.parquet"
+    if cache.exists():
+        row = pl.read_parquet(cache).row(0, named=True)
+        return row, int(row.pop("n_players"))
     df = leaguedashptstats.LeagueDashPtStats(
         season=SEASON, player_or_team="Player", pt_measure_type="SpeedDistance",
         per_mode_simple="PerGame", timeout=60,
     ).get_data_frames()[0]
     df = df[df["MIN"] >= MIN_MINUTES]
-    return pl.DataFrame({
-        "dist_miles": df["DIST_MILES"].astype(float).tolist(),
-        "minutes": df["MIN"].astype(float).tolist(),
-        "avg_speed_mph": df["AVG_SPEED"].astype(float).tolist(),
-    })
+    med = {
+        "dist_miles": float(df["DIST_MILES"].astype(float).median()),
+        "minutes": float(df["MIN"].astype(float).median()),
+        "avg_speed_mph": float(df["AVG_SPEED"].astype(float).median()),
+    }
+    pl.DataFrame([{**med, "n_players": len(df)}]).write_parquet(cache)
+    return med, len(df)
 
 
 def main() -> int:
     local = pl.read_csv(OUT / "player_workload.csv").filter(
         pl.col("live_minutes") >= MIN_MINUTES)
-    off = official()
+    off, off_n = official_medians()
 
     rows = [
         ("median distance per game (miles)",
-         local["dist_miles"].median(), off["dist_miles"].median(), 0.15),
+         local["dist_miles"].median(), off["dist_miles"], 0.15),
         ("median minutes per game",
-         local["live_minutes"].median(), off["minutes"].median(), 2.0),
+         local["live_minutes"].median(), off["minutes"], 2.0),
         ("median average speed (mph)",
          local["mean_speed"].median() * FT_PER_S_TO_MPH,
-         off["avg_speed_mph"].median(), 0.25),
+         off["avg_speed_mph"], 0.25),
     ]
 
     print(f"Raw-frame pipeline vs NBA published aggregates, {SEASON}")
     print(f"  local : {local.height} player-games from 10 games, {MIN_MINUTES}+ live min")
-    print(f"  official: {off.height} players, full season, {MIN_MINUTES}+ MPG\n")
+    src = f"{off_n} players" if off_n else "cached medians (see official_medians)"
+    print(f"  official: {src}, full season, {MIN_MINUTES}+ MPG\n")
     print(f"{'metric':38s} {'mine':>8s} {'official':>9s} {'diff':>8s}  status")
 
     results, ok_all = [], True
