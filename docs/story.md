@@ -50,8 +50,12 @@ would have shipped it; a coaching staff might have acted on it.
 {{fig:fig2_spacing_distribution|The distribution of team spacing across all frames: the raw material behind the quartile analysis, and the context for how much (or little) spacing actually varies possession to possession.}}
 
 The study's honest boundary: ten games is a workload-and-methods sample,
-not a league conclusion, and 2015-16 SportVU is not the current Hawk-Eye
-feed. What transfers is the discipline: validate against published
+not a league conclusion. And 2015-16 is old data by choice of the league,
+not of this study: the NBA has released no raw tracking since these
+SportVU logs briefly went public (Second Spectrum and now Hawk-Eye feeds
+are private), so this archive is the only raw tracking anyone outside a
+team building can work with. The family's data-provenance page documents
+the timeline. What transfers is the discipline: validate against published
 aggregates before trusting coordinates, calibrate clocks before joining
 sources, and hold out an event type the calibration never saw. The
 spacing-gradient artifact is this family's standing exhibit for why.
