@@ -89,7 +89,7 @@ python python/04_validate.py
 
 ### The de-duplication trap: the most important step in this repo
 
-<abbr title="The NBA's 2013-16 optical tracking system: x,y for all ten players (plus z for the ball) at 25 frames per second.">SportVU</abbr> logs are organised **by play-by-play event**, and consecutive events
+<abbr title="The NBA's 2013-16 optical tracking system: x,y for all ten players (plus z for the ball) at 25 frames per second.">SportVU</abbr> logs are organized **by play-by-play event**, and consecutive events
 **re-report overlapping windows of frames**. The same instant in the game appears in
 several events.
 
@@ -310,5 +310,5 @@ makes them the right basis for the next study planned for this family:
   quantifying what the public can and cannot reconstruct, so it gets the
   same treatment as every study here: designed first, gated when built.
 
-The data landscape for all of this is catalogued in the family's
+The data landscape for all of this is cataloged in the family's
 public-data-availability survey.
