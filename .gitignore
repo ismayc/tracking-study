@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.venv/
+.DS_Store
+.~lock.*#
+# Raw SportVU game files (~1 GB, re-downloadable; parquet caches committed)
+data/raw_sportvu/
