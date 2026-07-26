@@ -12,3 +12,7 @@ $PY -m pytest tests/python -q
 echo
 echo "=== reconciliation / validation ==="
 $PY python/04_validate.py | tail -1
+
+echo
+echo "=== modern aggregates: cached-data gate replay ==="
+$PY python/07_modern_aggregates.py --check | tail -1

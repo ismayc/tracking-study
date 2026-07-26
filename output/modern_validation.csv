@@ -1,0 +1,14 @@
+check,value,threshold,passed
+2013-14: player-table league miles reconcile with independently queried team table (relative),2.415558126747833e-6,0.002,true
+2014-15: player-table league miles reconcile with independently queried team table (relative),0.000016952723696997036,0.002,true
+2015-16: player-table league miles reconcile with independently queried team table (relative),0.000028773114401658615,0.002,true
+2016-17: player-table league miles reconcile with independently queried team table (relative),0.000028817128901174394,0.002,true
+2017-18: player-table league miles reconcile with independently queried team table (relative),4.738426984669802e-6,0.002,true
+2018-19: player-table league miles reconcile with independently queried team table (relative),6.735503512630425e-6,0.002,true
+2019-20: player-table league miles reconcile with independently queried team table (relative),2.6428039091970847e-6,0.002,true
+2020-21: player-table league miles reconcile with independently queried team table (relative),5.1601051628681315e-6,0.002,true
+2021-22: player-table league miles reconcile with independently queried team table (relative),0.00003663590776906886,0.002,true
+2022-23: player-table league miles reconcile with independently queried team table (relative),9.09278964516423e-6,0.002,true
+2023-24: player-table league miles reconcile with independently queried team table (relative),0.000018015258924210583,0.002,true
+2024-25: player-table league miles reconcile with independently queried team table (relative),0.00001773466284179427,0.002,true
+2025-26: player-table league miles reconcile with independently queried team table (relative),0.000011322181739132405,0.002,true
