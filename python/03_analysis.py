@@ -229,12 +229,12 @@ def main() -> int:
           f" - {spacing['hull_area'].quantile(0.75):.0f} sq ft")
 
     # ---- figures ----
-    top = workload.sort("dist_miles", descending=True).head(20)
+    top = workload.sort("dist_miles", descending=True).head(12)
     fig = go.Figure(layout=base_layout(
         "Distance covered during live play",
-        f"Top 20 player-games across {len(games)} games, 2015-16 SportVU",
+        f"Top 12 player-games across {len(games)} games, 2015-16 SportVU",
         "Miles covered", ""))
-    fig.update_layout(height=620, margin=dict(l=190, r=90, t=85, b=55))
+    fig.update_layout(height=500, margin=dict(l=190, r=90, t=85, b=55))
     fig.add_trace(go.Bar(
         x=top["dist_miles"].to_list(),
         y=[f"{p} ({g.split('.')[-3]})" for p, g in zip(top["player"], top["game"])],
@@ -248,6 +248,7 @@ def main() -> int:
         "Convex hull area of the five offensive players, 5 Hz samples",
         "Hull area (square feet)", "Share of frames"))
     fig.add_trace(go.Histogram(
+        marker_line=dict(color='white', width=1),
         x=spacing["hull_area"].to_list(), nbinsx=70, histnorm="probability",
         marker=dict(color=BLUE, line=dict(width=0)),
         hovertemplate="%{x:.0f} sq ft: %{y:.1%}<extra></extra>"))
