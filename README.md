@@ -68,6 +68,8 @@ python/01_download_sportvu.py   GitHub mirror -> data/raw_sportvu/*.json   (~100
 python/02_parse_moments.py      JSON          -> data/moments/*.parquet    (de-duplicated)
 python/03_analysis.py           workload + spacing -> output/, figures/
 python/04_validate.py           check against the NBA's own published aggregates
+python/05_harvest_pbp.py        play-by-play for the same 10 games
+python/06_possession_join.py    tracking <-> pbp join: heuristic validation + spacing-at-shot
 ```
 
 ```bash
@@ -132,6 +134,40 @@ The distribution is strongly right-skewed. For scale, a half court is 47 × 50 =
 court**. The long right tail is transition, where the five stretch across far more
 floor before the defense sets.
 
+### C. The play-by-play join — and the clock-latency trap inside it
+
+The join both README limitations asked for (3 and 5) is now done, and it
+contained the most instructive artifact in the study.
+
+**Validating the possession heuristic.** Play-by-play labels possession at
+discrete moments: the shooting team had the ball before every shot, the
+charged team before every turnover. Naively sampling the heuristic ~1s before
+each event's clock produced **67% agreement — and 43% in one game, worse than
+a coin flip.** The cause was not the heuristic: **play-by-play clocks lag the
+tracking clock by a per-game scorer latency of 2.5–6.0 seconds**, so a fixed
+small lead lands inside the *next* possession. Sweeping the lead made
+agreement climb from 24% to 96% on the worst game. After calibrating the lead
+per game **on shots only**, then scoring **turnovers as a held-out check**:
+
+| Check | Agreement |
+|---|---|
+| Shots (calibration metric) | **97.5%** (1,623 events) |
+| Turnovers (held out) | **93.5%** (232 events) |
+
+The heuristic is good; the naive join was broken. Per-game latencies are in
+`output/possession_validation.csv`.
+
+**Spacing at the moment of the shot.** With calibrated windows, eFG% across
+spacing quartiles is nearly flat (50.0% / 45.0% / 45.7% / 47.2% from tightest
+to widest), while the three-point-attempt share rises monotonically
+(23.5% → 29.8%): in this sample, spacing shapes the *shot profile* more than
+raw shot efficiency. The instructive part: **the uncalibrated join produced a
+strong, clean, monotone "wider = better shots" gradient (42% → 53%) that was
+entirely an artifact of sampling spacing in the wrong window.** A junior
+analyst ships that chart; it survives review because it confirms what
+everyone already believes. `figures/fig3_spacing_vs_efg.png` shows the
+calibrated version and says so in the subtitle.
+
 ---
 
 ## 4. Validation
@@ -186,17 +222,19 @@ whoever got the worst camera frame.
 2. **Ten games, early January 2016.** Chosen deterministically (alphabetically first
    in the archive) for reproducibility. Not a random sample of the season, so
    team-level numbers are not league-representative.
-3. **Possession is a heuristic.** Nearest-player-to-ball within 4 ft misassigns
-   during loose balls, steals, and contested rebounds. It has not been validated
-   against play-by-play possession labels — that join is the obvious next step and
-   is not done here.
+3. **Possession is a heuristic** — now validated: 97.5% agreement with the
+   shooting team at shots and 93.5% on held-out turnovers after per-game
+   clock-latency calibration (see Finding C). It still misassigns during loose
+   balls, steals, and contested rebounds, and the latency calibration itself
+   assumes the offset is constant within a game.
 4. **Spacing is convex hull area only.** It treats a well-spaced five-out set and a
    set with one player stranded in a corner as similar if the hulls match. It says
    nothing about whether the spacing was *useful* — no defender positions, no
    shot-quality outcome.
-5. **No shot-outcome join.** The tracking `eventId` maps to play-by-play event
-   numbers, so "spacing at the moment of the shot vs. shot outcome" is reachable.
-   It is not implemented here. Stated as unfinished rather than glossed.
+5. **Shot-outcome join** — now done (Finding C): spacing-at-shot vs eFG%, with
+   the clock-latency artifact documented. Ten games is still a small sample
+   for the flat-gradient conclusion; it rules out a large effect in this data,
+   not a small one.
 6. **Listed positions come from the game log**, not from where players actually
    stood.
 
@@ -206,10 +244,10 @@ whoever got the worst camera frame.
 
 **Does:** handling genuinely large spatiotemporal data (7.5M frames), finding and
 quantifying a 3× structural duplication trap, computational geometry per frame,
-validating against an independent external source, and discarding a statistic that
-turned out to measure sensor noise.
+validating against an independent external source, discarding a statistic that
+turned out to measure sensor noise, a validated cross-source join (tracking ↔
+play-by-play) including per-game clock-latency calibration, and a
+possession-heuristic accuracy estimate with a held-out check.
 
-**Does not:** possession-level modelling, defender-distance shot quality, player
-tracking through occlusion, or any work on a current-season feed. Requirement #5 in
-the skills matrix moves from ⬜ *gap* to 🟡 *partial* on the strength of this — not
-to ✅.
+**Does not:** defender-distance shot quality, player tracking through occlusion,
+or any work on a current-season feed (none is public).
