@@ -30,7 +30,7 @@ external validation against `LeagueDashPtStats` medians (2.00 vs 2.00 mi).
 New in this pass: a validated join to play-by-play. Pbp event clocks lag the
 tracking clock by a **per-game scorer latency of 2.5–6.0 s**; naive joining
 gives 67% possession-heuristic agreement (one game below coin-flip), and
-per-game calibration on shots with turnovers held out gives **97.5% / 93.5%**.
+per-game calibration on shots with turnovers held out gives **97.6% / 94.0%**.
 The uncalibrated join also manufactures a strong spurious spacing→eFG
 gradient (42→53%); calibrated, the gradient is flat-ish with 3PA share rising
 in spacing. Caveats: 2015-16 data (nothing newer is public), 10 games,

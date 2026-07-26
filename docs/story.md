@@ -31,8 +31,8 @@ the scorer's table, typing at human speed, in different arenas with
 different reflexes. A fixed correction cannot fix it because the lag
 differs by game; an uncorrected join lands events inside the *next*
 possession. Calibrating the latency per game on shots only, then scoring
-turnovers as a held-out check, agreement rises to 97.5% on 1,623 shot
-events and 93.5% on the 232 held-out turnovers.
+turnovers as a held-out check, agreement rises to 97.6% on 1,622 shot
+events and 94.0% on the 232 held-out turnovers.
 
 Here is why that matters beyond hygiene, and why the third figure is the
 one to linger on. With calibrated windows, effective field-goal percentage
