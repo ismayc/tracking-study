@@ -59,7 +59,7 @@ MUTED, AXIS = _a3.MUTED, _a3.AXIS
 
 LEAD_GRID = [x * 0.5 for x in range(17)]   # 0..8 s, calibration grid
 LOOKBACK_S = 2.0    # label window length
-MIN_FRAMES = 5      # need at least this many labelled frames in the window
+MIN_FRAMES = 5      # need at least this many labeled frames in the window
 
 
 def parse_clock(col: str) -> pl.Expr:
@@ -119,7 +119,7 @@ def calibrate_lead(poss: pl.DataFrame, pbp: pl.DataFrame) -> tuple[float, float]
 
 
 def hulls_by_clock(mom: pl.DataFrame, poss: pl.DataFrame) -> pl.DataFrame:
-    """Offensive hull area for every labelled frame (no subsample - we need
+    """Offensive hull area for every labeled frame (no subsample - we need
     specific instants, not a survey)."""
     players = mom.filter(pl.col("entity") == "player")
     off = (players.join(poss, on=["period", "game_clock"], how="inner")

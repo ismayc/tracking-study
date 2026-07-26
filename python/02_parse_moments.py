@@ -11,7 +11,7 @@ One output row is one entity in one frame:
 
 THE DE-DUPLICATION STEP IS THE WHOLE POINT OF THIS FILE.
 
-SportVU logs are organised by play-by-play event, and consecutive events re-report
+SportVU logs are organized by play-by-play event, and consecutive events re-report
 overlapping windows of frames — the same instant appears in several events. Counting
 raw frames therefore inflates every distance, every duration, and every average by
 roughly 2-4x. Public analyses of this dataset get this wrong routinely.
