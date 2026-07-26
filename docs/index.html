@@ -64,8 +64,14 @@ th { text-align: left; color: var(--ink-2); font-weight: 600;
   border-bottom: 2px solid var(--rule); padding: .4rem .6rem; }
 td { border-bottom: 1px solid var(--rule); padding: .4rem .6rem;
   vertical-align: top; }
-abbr[title] { text-decoration: underline dotted var(--accent);
-  text-underline-offset: 2px; cursor: help; }
+abbr[data-tip] { text-decoration: underline dotted var(--accent);
+  text-underline-offset: 2px; cursor: help; position: relative; }
+abbr[data-tip]:hover::after { content: attr(data-tip); position: absolute;
+  left: 0; top: 1.5em; z-index: 40; background: var(--ink);
+  color: var(--surface); padding: .5rem .75rem; border-radius: 7px;
+  width: max-content; max-width: min(340px, 80vw); font-size: .82rem;
+  line-height: 1.45; font-weight: 400; white-space: normal;
+  box-shadow: 0 4px 16px rgba(0,0,0,.28); pointer-events: none; }
 hr { border: none; border-top: 1px solid var(--rule); margin: 2rem 0; }
 .figure-card { background: #fff; border: 1px solid var(--rule);
   border-radius: 10px; margin: 1.4rem 0; overflow: hidden; }
@@ -111,7 +117,7 @@ details.terms li { margin: .3rem 0; color: var(--ink-2); }
 <h1>Seven and a half million frames, and the six-second trap hiding inside them</h1>
 <p>Optical tracking is the richest basketball data there is: x and y for all
 ten players (and z for the ball), twenty-five times a second. It is also
-the least forgiving. This study works with the raw 2015-16 <abbr title="The NBA's 2013-16 optical tracking system: x,y for all ten players (plus z for the ball) at 25 frames per second.">SportVU</abbr> feed
+the least forgiving. This study works with the raw 2015-16 <abbr data-tip="The NBA's 2013-16 optical tracking system: x,y for all ten players (plus z for the ball) at 25 frames per second.">SportVU</abbr> feed
 (7.5 million de-duplicated frames across ten games), and its most valuable
 finding is not a basketball result at all. It is a data trap that would
 have quietly fabricated a basketball result, and the calibration that
@@ -162,7 +168,7 @@ thousand, every season.</p>
 <p>The study's honest boundary: ten games is a workload-and-methods sample,
 not a league conclusion. And 2015-16 is old data by choice of the league,
 not of this study. The NBA has released no raw tracking since these
-<abbr title="The NBA's 2013-16 optical tracking system: x,y for all ten players (plus z for the ball) at 25 frames per second.">SportVU</abbr> logs briefly went public; the Second Spectrum and Hawk-Eye feeds
+<abbr data-tip="The NBA's 2013-16 optical tracking system: x,y for all ten players (plus z for the ball) at 25 frames per second.">SportVU</abbr> logs briefly went public; the Second Spectrum and Hawk-Eye feeds
 that followed are private. This archive is the only raw tracking anyone
 outside a team building can work with. The family's data-provenance page documents
 the timeline. What transfers is the discipline: validate against published
