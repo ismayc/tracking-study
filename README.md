@@ -1,8 +1,7 @@
 # Spatiotemporal tracking study — raw SportVU player movement
 
-Study addressing the single largest gap in `../requirements.md`: requirement
-#5, *"large and complex basketball datasets, including tracking/spatiotemporal
-data."*
+Raw spatiotemporal tracking at full scale, in the [basketball-data-science](https://github.com/ismayc/basketball-data-science)
+family — the heaviest public basketball dataset there is.
 
 **What this uses:** raw optical tracking — x, y (and z for the ball) at **25 frames
 per second** for all ten players and the ball. 10 games, **7.5 million de-duplicated
@@ -11,7 +10,7 @@ frames**.
 ---
 
 <!-- terms -->
-> **Terms used in this analysis.** Dotted-underlined terms anywhere below repeat these definitions on hover ([full glossary](../docs/glossary.md)).
+> **Terms used in this analysis.** Dotted-underlined terms anywhere below repeat these definitions on hover ([full glossary](https://github.com/ismayc/basketball-data-science/blob/main/docs/glossary.md)).
 >
 > - **eFG%** — Effective field-goal percentage: field-goal percentage with made threes counted 1.5x, putting twos and threes on one points scale.
 > - **SportVU** — The NBA's 2013-16 optical tracking system: x,y for all ten players (plus z for the ball) at 25 frames per second.
@@ -26,8 +25,8 @@ current.**
 |---|---|---|---|
 | **<abbr title="The NBA's 2013-16 optical tracking system: x,y for all ten players (plus z for the ball) at 25 frames per second.">SportVU</abbr> raw game logs, 2015-16** | 25 Hz x/y/z, 11 entities | Yes, via GitHub mirrors | ✅ **primary** |
 | `LeagueDashPtStats` (Second Spectrum) | Season aggregates per player | Yes, live | ✅ validation only |
-| `PlayByPlayV3` `xLegacy`/`yLegacy` | Shot location per event | Yes, live | see `../playbyplay-study` |
-| `ShotChartDetail` | Shot x/y + clock, ~102k shots/season | Yes, live | see `../playbyplay-study` |
+| `PlayByPlayV3` `xLegacy`/`yLegacy` | Shot location per event | Yes, live | see [playbyplay-study](https://github.com/ismayc/playbyplay-study) |
+| `ShotChartDetail` | Shot x/y + clock, ~102k shots/season | Yes, live | see [playbyplay-study](https://github.com/ismayc/playbyplay-study) |
 | Second Spectrum raw feed (2017–present) | 25 Hz | **No** — teams/licensees only | ✗ |
 | Hawk-Eye skeletal tracking (2023–present) | 29-point pose, 60 Hz | **No** — teams only | ✗ |
 
