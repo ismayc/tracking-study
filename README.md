@@ -10,6 +10,13 @@ frames**.
 
 ---
 
+<!-- terms -->
+> **Terms used in this analysis.** Dotted-underlined terms anywhere below repeat these definitions on hover ([full glossary](../docs/glossary.md)).
+>
+> - **eFG%** — Effective field-goal percentage: field-goal percentage with made threes counted 1.5x, putting twos and threes on one points scale.
+> - **SportVU** — The NBA's 2013-16 optical tracking system: x,y for all ten players (plus z for the ball) at 25 frames per second.
+<!-- /terms -->
+
 ## 1. Is public NBA tracking data actually available?
 
 Short answer: **raw tracking, yes — but only a frozen 2015-16 archive. Nothing
@@ -17,7 +24,7 @@ current.**
 
 | Source | Granularity | Public? | Used here |
 |---|---|---|---|
-| **SportVU raw game logs, 2015-16** | 25 Hz x/y/z, 11 entities | Yes, via GitHub mirrors | ✅ **primary** |
+| **<abbr title="The NBA's 2013-16 optical tracking system: x,y for all ten players (plus z for the ball) at 25 frames per second.">SportVU</abbr> raw game logs, 2015-16** | 25 Hz x/y/z, 11 entities | Yes, via GitHub mirrors | ✅ **primary** |
 | `LeagueDashPtStats` (Second Spectrum) | Season aggregates per player | Yes, live | ✅ validation only |
 | `PlayByPlayV3` `xLegacy`/`yLegacy` | Shot location per event | Yes, live | see `../playbyplay-study` |
 | `ShotChartDetail` | Shot x/y + clock, ~102k shots/season | Yes, live | see `../playbyplay-study` |
@@ -26,7 +33,7 @@ current.**
 
 ### Provenance of the raw data
 
-The NBA installed SportVU optical tracking (six cameras per arena, 25 fps) league-wide
+The NBA installed <abbr title="The NBA's 2013-16 optical tracking system: x,y for all ten players (plus z for the ball) at 25 frames per second.">SportVU</abbr> optical tracking (six cameras per arena, 25 fps) league-wide
 from 2013-14. During 2015-16 the raw game logs were briefly served from
 `stats.nba.com`. The league then withdrew public access and later switched vendors to
 Second Spectrum. Before access closed, the logs were archived on GitHub:
@@ -82,7 +89,7 @@ python python/04_validate.py
 
 ### The de-duplication trap — the most important step in this repo
 
-SportVU logs are organised **by play-by-play event**, and consecutive events
+<abbr title="The NBA's 2013-16 optical tracking system: x,y for all ten players (plus z for the ball) at 25 frames per second.">SportVU</abbr> logs are organised **by play-by-play event**, and consecutive events
 **re-report overlapping windows of frames**. The same instant in the game appears in
 several events.
 
@@ -163,7 +170,7 @@ agreement at either half's optimum stays between 94% and 100% — the 2-second
 label window makes the calibration tolerant to that much drift. The
 assumption is approximate, and approximately harmless here.
 
-**Spacing at the moment of the shot.** With calibrated windows, eFG% across
+**Spacing at the moment of the shot.** With calibrated windows, <abbr title="Effective field-goal percentage: field-goal percentage with made threes counted 1.5x, putting twos and threes on one points scale.">eFG%</abbr> across
 spacing quartiles is nearly flat (50.0% / 45.0% / 45.7% / 47.2% from tightest
 to widest), while the three-point-attempt share rises monotonically
 (23.5% → 29.8%): in this sample, spacing shapes the *shot profile* more than
@@ -181,7 +188,7 @@ calibrated version and says so in the subtitle.
 ### The check that matters: reproducing the league's own numbers
 
 The strongest available check is not a rule of thumb — it is the NBA's own published
-aggregates, computed by the vendor from the same SportVU feed and served through
+aggregates, computed by the vendor from the same <abbr title="The NBA's 2013-16 optical tracking system: x,y for all ten players (plus z for the ball) at 25 frames per second.">SportVU</abbr> feed and served through
 `LeagueDashPtStats(pt_measure_type="SpeedDistance")` for 2015-16.
 
 Independently flattening, de-duplicating, and differencing 25 Hz frames should
@@ -237,7 +244,7 @@ whoever got the worst camera frame.
    set with one player stranded in a corner as similar if the hulls match. It says
    nothing about whether the spacing was *useful* — no defender positions, no
    shot-quality outcome.
-5. **Shot-outcome join** — now done (Finding C): spacing-at-shot vs eFG%, with
+5. **Shot-outcome join** — now done (Finding C): spacing-at-shot vs <abbr title="Effective field-goal percentage: field-goal percentage with made threes counted 1.5x, putting twos and threes on one points scale.">eFG%</abbr>, with
    the clock-latency artifact documented. Ten games is still a small sample
    for the flat-gradient conclusion; it rules out a large effect in this data,
    not a small one.
