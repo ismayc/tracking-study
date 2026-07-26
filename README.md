@@ -3,9 +3,11 @@
 Raw spatiotemporal tracking at full scale, in the [basketball-data-science](https://github.com/ismayc/basketball-data-science)
 family: the heaviest public basketball dataset there is.
 
+<!-- gen:scale -->
 **What this uses:** raw optical tracking: x, y (and z for the ball) at **25 frames
 per second** for all ten players and the ball. 10 games, **7.5 million de-duplicated
 frames**.
+<!-- /gen:scale -->
 
 ---
 
@@ -114,6 +116,7 @@ Section 4 shows how it was caught.
 
 ---
 
+<!-- gen:findings -->
 ## 3. Findings
 
 ### A. Workload: 2.00 miles per player-game during live play
@@ -158,8 +161,8 @@ per game **on shots only**, then scoring **turnovers as a held-out check**:
 
 | Check | Agreement |
 |---|---|
-| Shots (calibration metric) | **97.5%** (1,623 events) |
-| Turnovers (held out) | **93.5%** (232 events) |
+| Shots (calibration metric) | **97.6%** (1,622 events) |
+| Turnovers (held out) | **94.0%** (232 events) |
 
 The heuristic is good; the naive join was broken. Per-game latencies are in
 `output/possession_validation.csv`.
@@ -180,9 +183,11 @@ entirely an artifact of sampling spacing in the wrong window.** A junior
 analyst ships that chart; it survives review because it confirms what
 everyone already believes. `figures/fig3_spacing_vs_efg.png` shows the
 calibrated version and says so in the subtitle.
+<!-- /gen:findings -->
 
 ---
 
+<!-- gen:validation -->
 ## 4. Validation
 
 ### The check that matters: reproducing the league's own numbers
@@ -224,9 +229,11 @@ stays in the output CSV, flagged as diagnostic only.
 The general lesson: **an extreme-value statistic on noisy sensor data measures the
 noise.** Ranking players by tracked top speed would have produced a leaderboard of
 whoever got the worst camera frame.
+<!-- /gen:validation -->
 
 ---
 
+<!-- gen:limitations -->
 ## 5. Limitations
 
 1. **The data is 2015-16.** Nine seasons stale, pre-dating the pace-and-space peak.
@@ -235,8 +242,8 @@ whoever got the worst camera frame.
 2. **Ten games, early January 2016.** Chosen deterministically (alphabetically first
    in the archive) for reproducibility. Not a random sample of the season, so
    team-level numbers are not league-representative.
-3. **Possession is a heuristic**, now validated: 97.5% agreement with the
-   shooting team at shots and 93.5% on held-out turnovers after per-game
+3. **Possession is a heuristic**, now validated: 97.6% agreement with the
+   shooting team at shots and 94.0% on held-out turnovers after per-game
    clock-latency calibration (see Finding C). It still misassigns during loose
    balls, steals, and contested rebounds, and the latency calibration itself
    assumes the offset is constant within a game.
@@ -250,6 +257,7 @@ whoever got the worst camera frame.
    not a small one.
 6. **Listed positions come from the game log**, not from where players actually
    stood.
+<!-- /gen:limitations -->
 
 ---
 
@@ -265,6 +273,7 @@ possession-heuristic accuracy estimate with a held-out check.
 **Does not:** defender-distance shot quality, player tracking through occlusion,
 or any work on a current-season feed (none is public).
 
+<!-- gen:modern -->
 ## 7. Modern coverage: the aggregate half is current
 
 The raw-frames half of this study is frozen in 2015-16 because the league
@@ -283,6 +292,7 @@ above (2015-16, 16.98) sits at the low end of the modern range, roughly 6%
 below current movement volume. 2025-26 posts the fastest minutes-weighted
 average speed of the tracking era (4.32 mph). Context worth carrying into
 any workload claim built on the 2015-16 sample.
+<!-- /gen:modern -->
 
 ## 8. Planned next: pseudo-tracking from broadcast video
 
