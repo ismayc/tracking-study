@@ -284,7 +284,7 @@ below current movement volume. 2025-26 posts the fastest minutes-weighted
 average speed of the tracking era (4.32 mph). Context worth carrying into
 any workload claim built on the 2015-16 sample.
 
-## 8. Scoped next study: pseudo-tracking from broadcast video
+## 8. Planned next: pseudo-tracking from broadcast video
 
 Raw tracking stops at 2015-16, but computer-vision datasets built from
 NBA broadcast footage now exist and are current: Basketball-51 (event
@@ -293,7 +293,7 @@ SportsMOT (multi-object tracking with player bounding boxes in image
 coordinates), and DeepSportRadar (player segmentation, re-identification,
 ball localization, and camera calibration tasks). None of them are
 tracking output. They are video plus annotations, which is precisely what
-makes them the right basis for the natural follow-on study:
+makes them the right basis for the next study planned for this family:
 
 - **Question.** How close can broadcast-derived pseudo-tracking get to
   real tracking, and which analytics survive the gap?
@@ -305,10 +305,10 @@ makes them the right basis for the natural follow-on study:
   against `LeagueDashPtStats` for the same games; hold out an annotation
   type the calibration never saw, mirroring the shots-then-turnovers
   protocol above.
-- **Why it is scoped rather than built.** The vision pipeline is real
-  engineering with its own failure modes, and vendors already run it at
-  scale. The analytics value is in quantifying what the public can and
-  cannot reconstruct, and that is a study, not a weekend.
+- **Status.** Planned as the next build. The vision pipeline is real
+  engineering with its own failure modes, and the analytics value is in
+  quantifying what the public can and cannot reconstruct, so it gets the
+  same treatment as every study here: designed first, gated when built.
 
 The data landscape for all of this is catalogued in the family's
 public-data-availability survey.

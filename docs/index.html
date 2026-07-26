@@ -157,9 +157,10 @@ the timeline. What transfers is the discipline: validate against published
 aggregates before trusting coordinates, calibrate clocks before joining
 sources, and hold out an event type the calibration never saw. The
 spacing-gradient artifact is this family's standing exhibit for why.
-The scoped follow-on (README, section 8) points at the modern
-broadcast-video datasets: pseudo-tracking from footage, error-quantified
-against the real thing.</p>
+The next study planned for this family builds on the modern
+broadcast-video datasets (SportsMOT, DeepSportRadar and kin):
+pseudo-tracking from footage, error-quantified against the real thing.
+The design is already written (README, section 8); the build is next.</p>
 <h2>Method, code, and verification</h2><p>The full technical write-up (data provenance, model specification, validation gates, and stated limitations) is the <a href="https://github.com/ismayc/tracking-study#readme">README</a>. The analysis is implemented independently in R and Python and reconciled to numeric tolerance; <code>run_checks.sh</code> replays every gate.</p>
 </main>
 <footer>Public data · dual-implementation reconciled · every gate scripted ·
