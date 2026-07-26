@@ -76,6 +76,7 @@ python/03_analysis.py           workload + spacing -> output/, figures/
 python/04_validate.py           check against the NBA's own published aggregates
 python/05_harvest_pbp.py        play-by-play for the same 10 games
 python/06_possession_join.py    tracking <-> pbp join: heuristic validation + spacing-at-shot
+python/07_modern_aggregates.py  published tracking aggregates, 2013-14 through 2025-26
 ```
 
 ```bash
@@ -263,3 +264,51 @@ possession-heuristic accuracy estimate with a held-out check.
 
 **Does not:** defender-distance shot quality, player tracking through occlusion,
 or any work on a current-season feed (none is public).
+
+## 7. Modern coverage: the aggregate half is current
+
+The raw-frames half of this study is frozen in 2015-16 because the league
+has published no raw tracking since. The aggregate half is not frozen.
+`python/07_modern_aggregates.py` harvests
+`LeagueDashPtStats(pt_measure_type="SpeedDistance")` for every season of
+the tracking era, 2013-14 through 2025-26, at both player and team level,
+and gates itself the family way: the player table's league totals must
+reconcile with the independently queried team table, every season
+(observed agreement ~1e-5; `output/modern_validation.csv`).
+
+The longitudinal read (`output/modern_movement_trend.csv`,
+`figures/fig4_modern_movement.html`): teams now cover about 18.0 to 18.3
+miles per game, up from 16.9 in 2013-14. The raw-frames season analyzed
+above (2015-16, 16.98) sits at the low end of the modern range, roughly 6%
+below current movement volume. 2025-26 posts the fastest minutes-weighted
+average speed of the tracking era (4.32 mph). Context worth carrying into
+any workload claim built on the 2015-16 sample.
+
+## 8. Scoped next study: pseudo-tracking from broadcast video
+
+Raw tracking stops at 2015-16, but computer-vision datasets built from
+NBA broadcast footage now exist and are current: Basketball-51 (event
+classification clips), NSVA (clips paired with play-by-play text),
+SportsMOT (multi-object tracking with player bounding boxes in image
+coordinates), and DeepSportRadar (player segmentation, re-identification,
+ball localization, and camera calibration tasks). None of them are
+tracking output. They are video plus annotations, which is precisely what
+makes them the right basis for the natural follow-on study:
+
+- **Question.** How close can broadcast-derived pseudo-tracking get to
+  real tracking, and which analytics survive the gap?
+- **Design.** SportsMOT boxes + DeepSportRadar camera calibration to
+  project detections into court coordinates; quantify the error
+  distribution; then re-run this study's spacing analysis on
+  pseudo-tracking and report which conclusions hold.
+- **Gates, same discipline as here.** Reconcile derived distance-covered
+  against `LeagueDashPtStats` for the same games; hold out an annotation
+  type the calibration never saw, mirroring the shots-then-turnovers
+  protocol above.
+- **Why it is scoped rather than built.** The vision pipeline is real
+  engineering with its own failure modes, and vendors already run it at
+  scale. The analytics value is in quantifying what the public can and
+  cannot reconstruct, and that is a study, not a weekend.
+
+The data landscape for all of this is catalogued in the family's
+public-data-availability survey.

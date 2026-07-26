@@ -49,6 +49,16 @@ would have shipped it; a coaching staff might have acted on it.
 
 {{fig:fig2_spacing_distribution|The distribution of team spacing across all frames: the raw material behind the quartile analysis, and the context for how much (or little) spacing actually varies possession to possession.}}
 
+One more thing keeps the study connected to the present. The raw frames
+stop in 2015-16, but the league still publishes vendor-computed tracking
+aggregates every season, and the same pipeline discipline extends to
+them: thirteen seasons of official distance and speed, 2013-14 through
+2025-26, harvested at player and team level with a reconciliation gate
+between the two (they agree to about one part in a hundred thousand,
+every season).
+
+{{fig:fig4_modern_movement|How far a team runs per game, every season of the tracking era. This figure is what keeps a decade-old raw sample honest: today's teams cover about 6% more ground than in 2015-16, and 2025-26 is the fastest season on record by average speed. Any workload claim built on the raw frames needs this context, and now it is measured rather than assumed.}}
+
 The study's honest boundary: ten games is a workload-and-methods sample,
 not a league conclusion. And 2015-16 is old data by choice of the league,
 not of this study: the NBA has released no raw tracking since these
@@ -59,3 +69,6 @@ the timeline. What transfers is the discipline: validate against published
 aggregates before trusting coordinates, calibrate clocks before joining
 sources, and hold out an event type the calibration never saw. The
 spacing-gradient artifact is this family's standing exhibit for why.
+The scoped follow-on (README, section 8) points at the modern
+broadcast-video datasets: pseudo-tracking from footage, error-quantified
+against the real thing.
