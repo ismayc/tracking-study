@@ -99,12 +99,12 @@ details.terms li { margin: .3rem 0; color: var(--ink-2); }
 <h1>Seven and a half million frames, and the six-second trap hiding inside them</h1>
 <p>Optical tracking is the richest basketball data there is: x and y for all
 ten players (and z for the ball), twenty-five times a second. It is also
-the least forgiving. This study works with the raw 2015-16 <abbr title="The NBA's 2013-16 optical tracking system: x,y for all ten players (plus z for the ball) at 25 frames per second.">SportVU</abbr> feed —
-7.5 million de-duplicated frames across ten games — and its most valuable
+the least forgiving. This study works with the raw 2015-16 <abbr title="The NBA's 2013-16 optical tracking system: x,y for all ten players (plus z for the ball) at 25 frames per second.">SportVU</abbr> feed
+(7.5 million de-duplicated frames across ten games), and its most valuable
 finding is not a basketball result at all. It is a data trap that would
 have quietly fabricated a basketball result, and the calibration that
 defused it.</p>
-<details class="terms"><summary>Terms used in this analysis</summary><ul><li><strong>SportVU</strong> — The NBA's 2013-16 optical tracking system: x,y for all ten players (plus z for the ball) at 25 frames per second.</li></ul></details>
+<details class="terms"><summary>Terms used in this analysis</summary><ul><li><strong>SportVU</strong>: The NBA's 2013-16 optical tracking system: x,y for all ten players (plus z for the ball) at 25 frames per second.</li></ul></details>
 <p>Start with the part that builds trust. Before asking the tracking data
 anything new, the pipeline asks it something the NBA has already answered:
 how far do players run? Distance covered, recomputed frame-by-frame from
@@ -113,14 +113,14 @@ aggregates. That check has to come first, because every claim downstream
 rides on the coordinates being what they say they are.</p>
 <figure class="figure-card"><iframe src="figures/fig1_distance_covered.html" loading="lazy" title="Distance covered"></iframe><figcaption>Distance covered per game, recomputed from raw frames against the NBA's published aggregates. This figure earns the study its license to say anything else: if the reconstruction disagreed with the league's own numbers, nothing downstream would be worth reading.</figcaption></figure>
 <p>The interesting work begins when tracking meets play-by-play, because
-that join is what turns anonymous coordinates into <em>possessions</em> — who had
+that join is what turns anonymous coordinates into <em>possessions</em>: who had
 the ball, which direction they were attacking, what happened next. The
 naive join matches each play-by-play event to the tracking frame with the
 same game clock. On the worst of the ten games, that naive join agreed
-with a possession-direction heuristic just 24% of the time — worse than a
+with a possession-direction heuristic just 24% of the time: worse than a
 coin flip, on a binary label.</p>
 <p>The cause was not the heuristic. <strong>Play-by-play clocks lag the tracking
-clock by a per-game scorer latency of 2.5 to 6.0 seconds</strong> — a human at
+clock by a per-game scorer latency of 2.5 to 6.0 seconds</strong>: a human at
 the scorer's table, typing at human speed, in different arenas with
 different reflexes. A fixed correction cannot fix it because the lag
 differs by game; an uncorrected join lands events inside the <em>next</em>
@@ -129,23 +129,23 @@ turnovers as a held-out check, agreement rises to 97.5% on 1,623 shot
 events and 93.5% on the 232 held-out turnovers.</p>
 <p>Here is why that matters beyond hygiene, and why the third figure is the
 one to linger on. With calibrated windows, effective field-goal percentage
-across floor-spacing quartiles is nearly flat — 50.0%, 45.0%, 45.7%, 47.2%
-from tightest to widest — while the share of threes rises steadily (23.5%
+across floor-spacing quartiles is nearly flat (50.0%, 45.0%, 45.7%, 47.2%
+from tightest to widest), while the share of threes rises steadily (23.5%
 to 29.8%). In this sample, spacing changes <em>what shots are taken</em> more than
 it changes raw efficiency. But run the same analysis with the naive,
 uncalibrated join and you get a clean, monotone, publication-ready
-"wider spacing = better shooting" gradient from 42% to 53% — <strong>entirely an
+"wider spacing = better shooting" gradient from 42% to 53%: <strong>entirely an
 artifact of sampling the floor at the wrong moment</strong>. A junior analyst
 would have shipped it; a coaching staff might have acted on it.</p>
-<figure class="figure-card"><iframe src="figures/fig3_spacing_vs_efg.html" loading="lazy" title="Spacing vs efg"></iframe><figcaption>Shooting efficiency by spacing quartile, measured at the calibrated moment of the shot. This is the study's cautionary centerpiece: the honest version is nearly flat, while the uncalibrated version of the same chart showed a strong clean gradient that was pure artifact. One figure, two joins, opposite conclusions — the argument for clock calibration in a single image.</figcaption></figure>
-<figure class="figure-card"><iframe src="figures/fig2_spacing_distribution.html" loading="lazy" title="Spacing distribution"></iframe><figcaption>The distribution of team spacing across all frames — the raw material behind the quartile analysis, and the context for how much (or little) spacing actually varies possession to possession.</figcaption></figure>
+<figure class="figure-card"><iframe src="figures/fig3_spacing_vs_efg.html" loading="lazy" title="Spacing vs efg"></iframe><figcaption>Shooting efficiency by spacing quartile, measured at the calibrated moment of the shot. This is the study's cautionary centerpiece: the honest version is nearly flat, while the uncalibrated version of the same chart showed a strong clean gradient that was pure artifact. One figure, two joins, opposite conclusions: the argument for clock calibration in a single image.</figcaption></figure>
+<figure class="figure-card"><iframe src="figures/fig2_spacing_distribution.html" loading="lazy" title="Spacing distribution"></iframe><figcaption>The distribution of team spacing across all frames: the raw material behind the quartile analysis, and the context for how much (or little) spacing actually varies possession to possession.</figcaption></figure>
 <p>The study's honest boundary: ten games is a workload-and-methods sample,
 not a league conclusion, and 2015-16 <abbr title="The NBA's 2013-16 optical tracking system: x,y for all ten players (plus z for the ball) at 25 frames per second.">SportVU</abbr> is not the current Hawk-Eye
-feed. What transfers is the discipline — validate against published
+feed. What transfers is the discipline: validate against published
 aggregates before trusting coordinates, calibrate clocks before joining
 sources, and hold out an event type the calibration never saw. The
 spacing-gradient artifact is this family's standing exhibit for why.</p>
-<h2>Method, code, and verification</h2><p>The full technical write-up — data provenance, model specification, validation gates, and stated limitations — is the <a href="https://github.com/ismayc/tracking-study#readme">README</a>. The analysis is implemented independently in R and Python and reconciled to numeric tolerance; <code>run_checks.sh</code> replays every gate.</p>
+<h2>Method, code, and verification</h2><p>The full technical write-up (data provenance, model specification, validation gates, and stated limitations) is the <a href="https://github.com/ismayc/tracking-study#readme">README</a>. The analysis is implemented independently in R and Python and reconciled to numeric tolerance; <code>run_checks.sh</code> replays every gate.</p>
 </main>
 <footer>Public data · dual-implementation reconciled · every gate scripted ·
 <a href="https://github.com/ismayc/basketball-data-science">the family on GitHub</a></footer>

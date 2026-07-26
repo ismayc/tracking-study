@@ -1,9 +1,9 @@
-# Spatiotemporal tracking study — raw SportVU player movement
+# Spatiotemporal tracking study: raw SportVU player movement
 
 Raw spatiotemporal tracking at full scale, in the [basketball-data-science](https://github.com/ismayc/basketball-data-science)
-family — the heaviest public basketball dataset there is.
+family: the heaviest public basketball dataset there is.
 
-**What this uses:** raw optical tracking — x, y (and z for the ball) at **25 frames
+**What this uses:** raw optical tracking: x, y (and z for the ball) at **25 frames
 per second** for all ten players and the ball. 10 games, **7.5 million de-duplicated
 frames**.
 
@@ -12,13 +12,13 @@ frames**.
 <!-- terms -->
 > **Terms used in this analysis.** Dotted-underlined terms anywhere below repeat these definitions on hover ([full glossary](https://github.com/ismayc/basketball-data-science/blob/main/docs/glossary.md)).
 >
-> - **eFG%** — Effective field-goal percentage: field-goal percentage with made threes counted 1.5x, putting twos and threes on one points scale.
-> - **SportVU** — The NBA's 2013-16 optical tracking system: x,y for all ten players (plus z for the ball) at 25 frames per second.
+> - **eFG%**: Effective field-goal percentage: field-goal percentage with made threes counted 1.5x, putting twos and threes on one points scale.
+> - **SportVU**: The NBA's 2013-16 optical tracking system: x,y for all ten players (plus z for the ball) at 25 frames per second.
 <!-- /terms -->
 
 ## 1. Is public NBA tracking data actually available?
 
-Short answer: **raw tracking, yes — but only a frozen 2015-16 archive. Nothing
+Short answer: **raw tracking, yes, but only a frozen 2015-16 archive. Nothing
 current.**
 
 | Source | Granularity | Public? | Used here |
@@ -27,8 +27,8 @@ current.**
 | `LeagueDashPtStats` (Second Spectrum) | Season aggregates per player | Yes, live | ✅ validation only |
 | `PlayByPlayV3` `xLegacy`/`yLegacy` | Shot location per event | Yes, live | see [playbyplay-study](https://github.com/ismayc/playbyplay-study) |
 | `ShotChartDetail` | Shot x/y + clock, ~102k shots/season | Yes, live | see [playbyplay-study](https://github.com/ismayc/playbyplay-study) |
-| Second Spectrum raw feed (2017–present) | 25 Hz | **No** — teams/licensees only | ✗ |
-| Hawk-Eye skeletal tracking (2023–present) | 29-point pose, 60 Hz | **No** — teams only | ✗ |
+| Second Spectrum raw feed (2017–present) | 25 Hz | **No**: teams/licensees only | ✗ |
+| Hawk-Eye skeletal tracking (2023–present) | 29-point pose, 60 Hz | **No**: teams only | ✗ |
 
 ### Provenance of the raw data
 
@@ -37,13 +37,13 @@ from 2013-14. During 2015-16 the raw game logs were briefly served from
 `stats.nba.com`. The league then withdrew public access and later switched vendors to
 Second Spectrum. Before access closed, the logs were archived on GitHub:
 
-- **Primary mirror used:** [`linouk23/NBA-Player-Movements`](https://github.com/linouk23/NBA-Player-Movements) — `data/2016.NBA.Raw.SportVU.Game.Logs/`, **636 games**, ~6 MB each (7z)
+- **Primary mirror used:** [`linouk23/NBA-Player-Movements`](https://github.com/linouk23/NBA-Player-Movements), `data/2016.NBA.Raw.SportVU.Game.Logs/`, **636 games**, ~6 MB each (7z)
 - **Upstream archive:** [`neilmj/BasketballData`](https://github.com/neilmj/BasketballData)
-- **Backup mirror:** [`sealneaward/nba-movement-data`](https://github.com/sealneaward/nba-movement-data) — explicitly created as a backup after the NBA closed public access
+- **Backup mirror:** [`sealneaward/nba-movement-data`](https://github.com/sealneaward/nba-movement-data), explicitly created as a backup after the NBA closed public access
 
 **This means the raw data is nine seasons stale.** Findings describe 2015-16
 basketball, not today's. That is a hard limitation of what is public, not a design
-choice — and it is exactly why teams' internal tracking feeds are valuable.
+choice. It is exactly why teams' internal tracking feeds are valuable.
 
 ### Raw JSON schema
 
@@ -86,7 +86,7 @@ python python/03_analysis.py
 python python/04_validate.py
 ```
 
-### The de-duplication trap — the most important step in this repo
+### The de-duplication trap: the most important step in this repo
 
 <abbr title="The NBA's 2013-16 optical tracking system: x,y for all ten players (plus z for the ball) at 25 frames per second.">SportVU</abbr> logs are organised **by play-by-play event**, and consecutive events
 **re-report overlapping windows of frames**. The same instant in the game appears in
@@ -106,7 +106,7 @@ Section 4 shows how it was caught.
 
 | Decision | Value | Why |
 |---|---|---|
-| `dt` from the **game clock**, not wall clock | — | Frames where the clock is stopped get `dt = 0` and drop out. Distance is then movement during **live play**, which is the meaningful denominator |
+| `dt` from the **game clock**, not wall clock | none | Frames where the clock is stopped get `dt = 0` and drop out. Distance is then movement during **live play**, which is the meaningful denominator |
 | Max plausible speed | 25 ft/s | Above this is a tracking glitch, not a human. **See the caveat in Section 4** |
 | Possession = team of nearest player to ball | ≤ 4 ft, ball below 10 ft | The height condition removes shots in flight and lobs, when the nearest player is not the one in control |
 | Spacing subsample | every 5th frame (5 Hz) | Spacing does not change meaningfully at 25 Hz; this makes ~117k convex hulls tractable |
@@ -115,7 +115,7 @@ Section 4 shows how it was caught.
 
 ## 3. Findings
 
-### A. Workload — 2.00 miles per player-game during live play
+### A. Workload: 2.00 miles per player-game during live play
 
 Across 210 player-games, for the 120 with 20+ live minutes:
 
@@ -126,7 +126,7 @@ Across 210 player-games, for the 120 with 20+ live minutes:
 | Average speed | **6.22 ft/s** (4.24 mph) |
 | 95th-percentile speed | **14.8 ft/s** (10.1 mph) |
 
-### B. Spacing — the offense occupies a median 529 sq ft
+### B. Spacing: the offense occupies a median 529 sq ft
 
 Convex hull area of the five offensive players, over 116,801 sampled frames:
 
@@ -140,7 +140,7 @@ The distribution is strongly right-skewed. For scale, a half court is 47 × 50 =
 court**. The long right tail is transition, where the five stretch across far more
 floor before the defense sets.
 
-### C. The play-by-play join — and the clock-latency trap inside it
+### C. The play-by-play join, and the clock-latency trap inside it
 
 The join both README limitations asked for (3 and 5) is now done, and it
 contained the most instructive artifact in the study.
@@ -148,7 +148,7 @@ contained the most instructive artifact in the study.
 **Validating the possession heuristic.** Play-by-play labels possession at
 discrete moments: the shooting team had the ball before every shot, the
 charged team before every turnover. Naively sampling the heuristic ~1s before
-each event's clock produced **67% agreement — and 43% in one game, worse than
+each event's clock produced **67% agreement, and 43% in one game, worse than
 a coin flip.** The cause was not the heuristic: **play-by-play clocks lag the
 tracking clock by a per-game scorer latency of 2.5–6.0 seconds**, so a fixed
 small lead lands inside the *next* possession. Sweeping the lead made
@@ -165,7 +165,7 @@ The heuristic is good; the naive join was broken. Per-game latencies are in
 
 Robustness of the constant-latency assumption: calibrating each half of each
 game separately moves the chosen lead by up to 2.5 s in a few games, but
-agreement at either half's optimum stays between 94% and 100% — the 2-second
+agreement at either half's optimum stays between 94% and 100%. The 2-second
 label window makes the calibration tolerant to that much drift. The
 assumption is approximate, and approximately harmless here.
 
@@ -186,7 +186,7 @@ calibrated version and says so in the subtitle.
 
 ### The check that matters: reproducing the league's own numbers
 
-The strongest available check is not a rule of thumb — it is the NBA's own published
+The strongest available check is not a rule of thumb. It is the NBA's own published
 aggregates, computed by the vendor from the same <abbr title="The NBA's 2013-16 optical tracking system: x,y for all ten players (plus z for the ball) at 25 frames per second.">SportVU</abbr> feed and served through
 `LeagueDashPtStats(pt_measure_type="SpeedDistance")` for 2015-16.
 
@@ -203,7 +203,7 @@ reproduce them. It does:
 
 **This is also how the de-duplication bug would have been caught.** Skipping that
 step inflates distance ~3×, which would have shown up here as 6 miles per game
-against the league's 2.0 — impossible to miss, and impossible to detect without an
+against the league's 2.0: impossible to miss, and impossible to detect without an
 external reference.
 
 ### A statistic that did not survive: top speed
@@ -212,7 +212,7 @@ The first version of this analysis reported median top speed as 24.8 ft/s. That
 number is meaningless.
 
 **73% of players' observed maximum sits within 0.5 ft/s of the 25 ft/s glitch
-filter.** The statistic was measuring the threshold, not the athlete — optical
+filter.** The statistic was measuring the threshold, not the athlete. Optical
 tracking produces occasional single-frame position jumps, and a maximum over ~40,000
 frames will find them every time.
 
@@ -234,16 +234,16 @@ whoever got the worst camera frame.
 2. **Ten games, early January 2016.** Chosen deterministically (alphabetically first
    in the archive) for reproducibility. Not a random sample of the season, so
    team-level numbers are not league-representative.
-3. **Possession is a heuristic** — now validated: 97.5% agreement with the
+3. **Possession is a heuristic**, now validated: 97.5% agreement with the
    shooting team at shots and 93.5% on held-out turnovers after per-game
    clock-latency calibration (see Finding C). It still misassigns during loose
    balls, steals, and contested rebounds, and the latency calibration itself
    assumes the offset is constant within a game.
 4. **Spacing is convex hull area only.** It treats a well-spaced five-out set and a
    set with one player stranded in a corner as similar if the hulls match. It says
-   nothing about whether the spacing was *useful* — no defender positions, no
+   nothing about whether the spacing was *useful*: no defender positions, no
    shot-quality outcome.
-5. **Shot-outcome join** — now done (Finding C): spacing-at-shot vs <abbr title="Effective field-goal percentage: field-goal percentage with made threes counted 1.5x, putting twos and threes on one points scale.">eFG%</abbr>, with
+5. **Shot-outcome join**, now done (Finding C): spacing-at-shot vs <abbr title="Effective field-goal percentage: field-goal percentage with made threes counted 1.5x, putting twos and threes on one points scale.">eFG%</abbr>, with
    the clock-latency artifact documented. Ten games is still a small sample
    for the flat-gradient conclusion; it rules out a large effect in this data,
    not a small one.
