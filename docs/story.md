@@ -69,6 +69,7 @@ the timeline. What transfers is the discipline: validate against published
 aggregates before trusting coordinates, calibrate clocks before joining
 sources, and hold out an event type the calibration never saw. The
 spacing-gradient artifact is this family's standing exhibit for why.
-The scoped follow-on (README, section 8) points at the modern
-broadcast-video datasets: pseudo-tracking from footage, error-quantified
-against the real thing.
+The next study planned for this family builds on the modern
+broadcast-video datasets (SportsMOT, DeepSportRadar and kin):
+pseudo-tracking from footage, error-quantified against the real thing.
+The design is already written (README, section 8); the build is next.
