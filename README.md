@@ -157,6 +157,12 @@ per game **on shots only**, then scoring **turnovers as a held-out check**:
 The heuristic is good; the naive join was broken. Per-game latencies are in
 `output/possession_validation.csv`.
 
+Robustness of the constant-latency assumption: calibrating each half of each
+game separately moves the chosen lead by up to 2.5 s in a few games, but
+agreement at either half's optimum stays between 94% and 100% — the 2-second
+label window makes the calibration tolerant to that much drift. The
+assumption is approximate, and approximately harmless here.
+
 **Spacing at the moment of the shot.** With calibrated windows, eFG% across
 spacing quartiles is nearly flat (50.0% / 45.0% / 45.7% / 47.2% from tightest
 to widest), while the three-point-attempt share rises monotonically
