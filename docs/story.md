@@ -8,6 +8,25 @@ finding is not a basketball result at all. It is a data trap that would
 have quietly fabricated a basketball result, and the calibration that
 defused it.
 
+<div class="tiles">
+<div class="tile"><div class="label">Scorer's-table lag</div>
+<div class="value">2.5&ndash;6.0<small> s</small></div>
+<div class="sub">How far play-by-play clocks trail the tracking clock, varying game by game.</div></div>
+<div class="tile"><div class="label">Join agreement</div>
+<div class="value">24% &rarr; 97.6%</div>
+<div class="sub">Worst-game naive join versus the calibrated join on 1,622 shot events.</div></div>
+<div class="tile"><div class="label">The phantom gradient</div>
+<div class="value">42% &rarr; 53%</div>
+<div class="sub">The clean spacing-helps-shooting story the uncalibrated join invents. The honest chart is nearly flat.</div></div>
+<div class="tile"><div class="label">Sample</div>
+<div class="value">7.5<small>M</small></div>
+<div class="sub">De-duplicated SportVU frames across ten games, 25 per second.</div></div>
+</div>
+
+<div class="eyebrow beat">The license to speak</div>
+
+## First, the coordinates reproduce the league's own numbers
+
 Start with the part that builds trust. Before asking the tracking data
 anything new, the pipeline asks it something the NBA has already answered:
 how far do players run? Distance covered, recomputed frame-by-frame from
@@ -16,6 +35,10 @@ aggregates. That check has to come first, because every claim downstream
 rides on the coordinates being what they say they are.
 
 {{fig:fig1_distance_covered|Distance covered per game, recomputed from raw frames against the NBA's published aggregates. This figure earns the study its license to say anything else: if the reconstruction disagreed with the league's own numbers, nothing downstream would be worth reading.}}
+
+<div class="eyebrow beat">The trap</div>
+
+## The scorer's clock lies, and it lies differently every game
 
 The interesting work begins when tracking meets play-by-play, because
 that join is what turns anonymous coordinates into *possessions*: who had
@@ -34,6 +57,10 @@ possession. Calibrating the latency per game on shots only, then scoring
 turnovers as a held-out check, agreement rises to 97.6% on 1,622 shot
 events and 94.0% on the 232 held-out turnovers.
 
+<div class="eyebrow beat">The payoff</div>
+
+## Spacing changes the shots taken, not the shooting
+
 Here is why that matters beyond hygiene, and why the third figure is the
 one to linger on. With calibrated windows, effective field-goal percentage
 across floor-spacing quartiles is nearly flat (50.0%, 45.0%, 45.7%, 47.2%
@@ -49,6 +76,10 @@ would have shipped it; a coaching staff might have acted on it.
 
 {{fig:fig2_spacing_distribution|The distribution of team spacing across all frames: the raw material behind the quartile analysis, and the context for how much (or little) spacing actually varies possession to possession.}}
 
+<div class="eyebrow beat">The modern era</div>
+
+## Today's teams cover about 6% more ground
+
 One more thing keeps the study connected to the present. The raw frames
 stop in 2015-16, but the league still publishes vendor-computed tracking
 aggregates every season. The same pipeline discipline extends to them:
@@ -58,6 +89,10 @@ the two tables together, and they agree to about one part in a hundred
 thousand, every season.
 
 {{fig:fig4_modern_movement|How far a team runs per game, every season of the tracking era. This figure is what keeps a decade-old raw sample honest: today's teams cover about 6% more ground than in 2015-16, and 2025-26 is the fastest season on record by average speed. Any workload claim built on the raw frames needs this context, and now it is measured rather than assumed.}}
+
+<div class="eyebrow beat">The boundary, and the lesson</div>
+
+## Ten games can't crown a conclusion. The discipline transfers anyway.
 
 The study's honest boundary: ten games is a workload-and-methods sample,
 not a league conclusion. And 2015-16 is old data by choice of the league,
