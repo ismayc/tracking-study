@@ -14,6 +14,10 @@ echo "=== reconciliation / validation ==="
 $PY python/04_validate.py | tail -1
 
 echo
+echo "=== frame coverage: every game's tracking covers its clock ==="
+$PY python/09_frame_coverage.py --check | tail -1
+
+echo
 echo "=== modern aggregates: cached-data gate replay ==="
 $PY python/07_modern_aggregates.py --check | tail -1
 

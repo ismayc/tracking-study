@@ -26,7 +26,9 @@ From 25-frames-per-second camera data across 10 games:
 7.5M de-duplicated frames (raw archive re-reports overlapping windows per
 event: 3.07× duplication measured, the classic trap in this dataset).
 Clock-derived dt so distance counts live play only; 25 ft/s glitch filter;
-external validation against `LeagueDashPtStats` medians (2.00 vs 2.00 mi).
+external validation against `LeagueDashPtStats` medians (2.02 vs 2.00 mi,
+leaving out the two games whose frames miss part of the clock; corrected
+October 19, 2026).
 New in this pass: a validated join to play-by-play. Pbp event clocks lag the
 tracking clock by a **per-game scorer latency of 2.5–6.0 s**; naive joining
 gives 67% possession-heuristic agreement (one game below coin-flip), and

@@ -85,8 +85,26 @@ def possession_numbers() -> dict[str, str]:
     }
 
 
-def findings_section() -> str:
+def workload_kept() -> tuple[pl.DataFrame, int, int]:
+    """Workload rows in the analysis, with kept and total game counts."""
     w = pl.read_csv(OUT / "player_workload.csv")
+    kept = w.filter(pl.col("in_workload"))
+    return kept, kept["game"].n_unique(), w["game"].n_unique()
+
+
+def excluded_numbers(w_all: pl.DataFrame) -> dict[str, str]:
+    """Clock coverage of the games left out of workload, from 09's table."""
+    out = w_all.filter(~pl.col("in_workload"))["game"].unique().to_list()
+    fc = pl.read_csv(OUT / "frame_coverage.csv").filter(pl.col("game").is_in(out))
+    per_game = fc.group_by("game").agg(pl.col("distinct").sum() / pl.col("expected").sum())
+    missing = (1 - per_game["distinct"]).sort()
+    return {"miss_lo": f"{missing[0]:.0%}", "miss_hi": f"{missing[-1]:.0%}",
+            "max_gap": f"{fc['start_gap'].max():.0f}"}
+
+
+def findings_section() -> str:
+    w, n_kept, n_all = workload_kept()
+    ex = excluded_numbers(pl.read_csv(OUT / "player_workload.csv"))
     sub = w.filter(pl.col("live_minutes") >= MIN_LIVE_MINUTES)
     med_miles = f"{sub['dist_miles'].median():.2f}"
     med_min = f"{sub['live_minutes'].median():.1f}"
@@ -109,7 +127,7 @@ def findings_section() -> str:
 
 ### A. Workload: {med_miles} miles per player-game during live play
 
-Across {w.height} player-games, for the {sub.height} with 20+ live minutes:
+Across {w.height} player-games in {n_kept} of the {n_all} games, for the {sub.height} with 20+ live minutes:
 
 | Metric | Median |
 |---|---|
@@ -117,6 +135,15 @@ Across {w.height} player-games, for the {sub.height} with 20+ live minutes:
 | Live minutes | **{med_min}** |
 | Average speed | **{med_fts:.2f} ft/s** ({med_fts * MPH_PER_FTS:.2f} mph) |
 | 95th-percentile speed | **{p95_fts:.1f} ft/s** ({p95_fts * MPH_PER_FTS:.1f} mph) |
+
+**Correction, October 19, 2026.** The first version of this finding used all
+{n_all} games. A per-game check against the NBA's own tracking box score
+(`BoxScorePlayerTrackV3`) found two games whose players' distances ran short,
+and the frames show why: HOU at SAS and DET at IND are missing {ex["miss_lo"]} to
+{ex["miss_hi"]} of their game clock, up to {ex["max_gap"]} seconds at a period start. They
+are now left out of every workload number; they still count toward the frame
+totals, spacing, and the play-by-play join. `09_frame_coverage.py` gates every
+game on clock coverage, and `output/frame_coverage.csv` lists each period.
 
 ### B. Spacing: the offense occupies a median {med_hull} sq ft
 
@@ -181,7 +208,7 @@ def validation_section() -> str:
     mins = row["median minutes per game"]
     speed = row["median average speed (mph)"]
 
-    w = pl.read_csv(OUT / "player_workload.csv")
+    w, _, _ = workload_kept()
     sub = w.filter(pl.col("live_minutes") >= MIN_LIVE_MINUTES)
     med_max = f"{sub['max_speed'].median():.1f}"
     near_cap = f"{(sub['max_speed'] >= 24.5).mean():.0%}"
@@ -242,7 +269,8 @@ def limitations_section() -> str:
    tracking exists for recent seasons.
 2. **Ten games, early January 2016.** Chosen deterministically (alphabetically first
    in the archive) for reproducibility. Not a random sample of the season, so
-   team-level numbers are not league-representative.
+   team-level numbers are not league-representative. Two of the ten have
+   incomplete frames and are left out of the workload numbers (see Finding A).
 3. **Possession is a heuristic**, now validated: {pv["fga_rate"]} agreement with the
    shooting team at shots and {pv["to_rate"]} on held-out turnovers after per-game
    clock-latency calibration (see Finding C). It still misassigns during loose

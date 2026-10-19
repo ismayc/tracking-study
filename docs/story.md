@@ -34,6 +34,12 @@ raw coordinates, reproduces the league's published player-tracking
 aggregates. That check has to come first, because every claim downstream
 rides on the coordinates being what they say they are.
 
+**Correction, October 19, 2026.** A per-game check against the NBA's own
+tracking box score found two of the ten games missing stretches of game
+clock, up to 43 seconds at the start of a period, so their players'
+distances came out short. The workload numbers and this chart now use the
+other eight games. The match with the league held with or without them.
+
 {{fig:fig1_distance_covered|Distance covered per game, recomputed from raw frames against the NBA's published aggregates. This figure earns the study its license to say anything else: if the reconstruction disagreed with the league's own numbers, nothing downstream would be worth reading.}}
 
 <div class="eyebrow beat">The trap</div>

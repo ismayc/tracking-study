@@ -21,6 +21,7 @@ Run: python python/03_analysis.py
 """
 from __future__ import annotations
 
+import importlib.util
 from pathlib import Path
 
 import numpy as np
@@ -47,6 +48,17 @@ MAX_SPEED_FTS = 25.0           # ~17 mph; above this is a tracking glitch, not a
 POSSESSION_MAX_DIST = 4.0      # ft from ball to nearest player to call it possession
 POSSESSION_MAX_BALL_Z = 10.0   # ft; above this the ball is a shot or high pass
 SPACING_SUBSAMPLE = 5          # use every 5th frame (5 Hz) for the spacing sweep
+
+
+def workload_excluded() -> dict[str, str]:
+    """Games whose frames miss enough clock to understate workload, owned by
+    09_frame_coverage.py (which gates on them). Flagged, not dropped: they
+    still count toward frames, spacing, and the possession join."""
+    spec = importlib.util.spec_from_file_location(
+        "frame_coverage", Path(__file__).with_name("09_frame_coverage.py"))
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod.WORKLOAD_EXCLUDED
 
 
 def base_layout(title: str, subtitle: str, x_title: str, y_title: str) -> go.Layout:
@@ -205,14 +217,20 @@ def main() -> int:
         print(f"  {path.stem}: {mom.height:,} frames, "
               f"{w.height} players, {s.height:,} spacing samples", flush=True)
 
-    workload = pl.concat(workloads)
+    excluded = workload_excluded()
+    workload = pl.concat(workloads).with_columns(
+        in_workload=~pl.col("game").is_in(list(excluded)))
     spacing = pl.concat(spacings)
     workload.write_csv(OUT / "player_workload.csv")
     spacing.write_csv(OUT / "spacing_frames.csv")
 
     # ---- external validation: starters should be near 2.5 miles per game ----
-    starters = workload.filter(pl.col("live_minutes") >= 20)
-    print(f"\nWorkload: {workload.height} player-games; "
+    for game, reason in sorted(excluded.items()):
+        print(f"\n  excluded from workload: {game} ({reason})", end="")
+    kept = workload.filter(pl.col("in_workload"))
+    n_kept = kept["game"].n_unique()
+    starters = kept.filter(pl.col("live_minutes") >= 20)
+    print(f"\nWorkload: {kept.height} player-games in {n_kept} games; "
           f"{starters.height} with 20+ live minutes")
     print(f"  median distance, 20+ live min : {starters['dist_miles'].median():.2f} miles")
     print(f"  median live minutes           : {starters['live_minutes'].median():.1f}")
@@ -229,10 +247,10 @@ def main() -> int:
           f" - {spacing['hull_area'].quantile(0.75):.0f} sq ft")
 
     # ---- figures ----
-    top = workload.sort("dist_miles", descending=True).head(12)
+    top = kept.sort("dist_miles", descending=True).head(12)
     fig = go.Figure(layout=base_layout(
         "Distance covered during live play",
-        f"Top 12 player-games across {len(games)} games, 2015-16 SportVU",
+        f"Top 12 player-games across {n_kept} games, 2015-16 SportVU",
         "Miles covered", ""))
     fig.update_layout(height=500, margin=dict(l=190, r=90, t=85, b=55))
     fig.add_trace(go.Bar(

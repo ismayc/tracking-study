@@ -79,6 +79,8 @@ python/04_validate.py           check against the NBA's own published aggregates
 python/05_harvest_pbp.py        play-by-play for the same 10 games
 python/06_possession_join.py    tracking <-> pbp join: heuristic validation + spacing-at-shot
 python/07_modern_aggregates.py  published tracking aggregates, 2013-14 through 2025-26
+python/08_findings.py           README numbers from output/
+python/09_frame_coverage.py     per-game clock coverage gate; owns the workload exclusions
 ```
 
 ```bash
@@ -119,16 +121,25 @@ Section 4 shows how it was caught.
 <!-- gen:findings -->
 ## 3. Findings
 
-### A. Workload: 2.00 miles per player-game during live play
+### A. Workload: 2.02 miles per player-game during live play
 
-Across 210 player-games, for the 120 with 20+ live minutes:
+Across 167 player-games in 8 of the 10 games, for the 102 with 20+ live minutes:
 
 | Metric | Median |
 |---|---|
-| Distance covered | **2.00 miles** |
-| Live minutes | **27.6** |
-| Average speed | **6.22 ft/s** (4.24 mph) |
+| Distance covered | **2.02 miles** |
+| Live minutes | **28.3** |
+| Average speed | **6.20 ft/s** (4.23 mph) |
 | 95th-percentile speed | **14.8 ft/s** (10.1 mph) |
+
+**Correction, October 19, 2026.** The first version of this finding used all
+10 games. A per-game check against the NBA's own tracking box score
+(`BoxScorePlayerTrackV3`) found two games whose players' distances ran short,
+and the frames show why: HOU at SAS and DET at IND are missing 13% to
+22% of their game clock, up to 43 seconds at a period start. They
+are now left out of every workload number; they still count toward the frame
+totals, spacing, and the play-by-play join. `09_frame_coverage.py` gates every
+game on clock coverage, and `output/frame_coverage.csv` lists each period.
 
 ### B. Spacing: the offense occupies a median 529 sq ft
 
@@ -201,9 +212,9 @@ reproduce them. It does:
 
 | Metric | This pipeline | NBA official | Difference |
 |---|---|---|---|
-| Median distance per game | **2.00 mi** | **2.00 mi** | −0.00 |
-| Median minutes per game | **27.64** | **28.05** | −0.41 |
-| Median average speed | **4.24 mph** | **4.23 mph** | +0.01 |
+| Median distance per game | **2.02 mi** | **2.00 mi** | +0.02 |
+| Median minutes per game | **28.34** | **28.05** | +0.29 |
+| Median average speed | **4.23 mph** | **4.23 mph** | −0.00 |
 
 `04_validate.py` exits non-zero if any of these drift outside tolerance.
 
@@ -217,7 +228,7 @@ external reference.
 The first version of this analysis reported median top speed as 24.8 ft/s. That
 number is meaningless.
 
-**73% of players' observed maximum sits within 0.5 ft/s of the 25 ft/s glitch
+**76% of players' observed maximum sits within 0.5 ft/s of the 25 ft/s glitch
 filter.** The statistic was measuring the threshold, not the athlete. Optical
 tracking produces occasional single-frame position jumps, and a maximum over ~40,000
 frames will find them every time.
@@ -241,7 +252,8 @@ whoever got the worst camera frame.
    tracking exists for recent seasons.
 2. **Ten games, early January 2016.** Chosen deterministically (alphabetically first
    in the archive) for reproducibility. Not a random sample of the season, so
-   team-level numbers are not league-representative.
+   team-level numbers are not league-representative. Two of the ten have
+   incomplete frames and are left out of the workload numbers (see Finding A).
 3. **Possession is a heuristic**, now validated: 97.6% agreement with the
    shooting team at shots and 94.0% on held-out turnovers after per-game
    clock-latency calibration (see Finding C). It still misassigns during loose

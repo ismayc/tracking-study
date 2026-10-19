@@ -13,7 +13,8 @@ The de-duplication step is what this check really tests. Skipping it inflates
 distance by ~3x, which would show up here immediately.
 
 Note on comparability: the official table covers all 82 games for every player,
-while the local sample is 10 games from early January 2016. The comparison is
+while the local sample is the early-January 2016 games that 09_frame_coverage.py
+does not exclude from workload (8 of 10 since 2026-10-19). The comparison is
 therefore between *distributions* (medians across players), not player-by-player.
 
 Run: python python/04_validate.py
@@ -60,7 +61,7 @@ def official_medians() -> tuple[dict, int]:
 
 def main() -> int:
     local = pl.read_csv(OUT / "player_workload.csv").filter(
-        pl.col("live_minutes") >= MIN_MINUTES)
+        pl.col("in_workload") & (pl.col("live_minutes") >= MIN_MINUTES))
     off, off_n = official_medians()
 
     rows = [
@@ -74,7 +75,7 @@ def main() -> int:
     ]
 
     print(f"Raw-frame pipeline vs NBA published aggregates, {SEASON}")
-    print(f"  local : {local.height} player-games from 10 games, {MIN_MINUTES}+ live min")
+    print(f"  local : {local.height} player-games from {local['game'].n_unique()} games, {MIN_MINUTES}+ live min")
     src = f"{off_n} players" if off_n else "cached medians (see official_medians)"
     print(f"  official: {src}, full season, {MIN_MINUTES}+ MPG\n")
     print(f"{'metric':38s} {'mine':>8s} {'official':>9s} {'diff':>8s}  status")
