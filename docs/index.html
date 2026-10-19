@@ -161,6 +161,21 @@ details.terms summary { padding: .55rem .9rem; cursor: pointer;
   color: var(--ink-2); font-weight: 600; }
 details.terms ul { margin: 0; padding: .2rem 1.4rem .8rem; }
 details.terms li { margin: .3rem 0; color: var(--ink-2); }
+/* sticky section nav (study pages): the masthead scrolls away, this stays */
+.sectionnav { position: sticky; top: 0; z-index: 30; background: var(--surface);
+  border-bottom: 1px solid var(--rule); }
+.sectionnav .inner { width: min(1200px, 94vw); margin: 0 auto; display: flex;
+  gap: 1.3rem; overflow-x: auto; white-space: nowrap; scrollbar-width: none;
+  padding: .55rem 0 .45rem; }
+.sectionnav .inner::-webkit-scrollbar { display: none; }
+.sectionnav a { font-family: "Barlow Condensed", system-ui, sans-serif;
+  font-weight: 500; font-size: .95rem; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--ink-3); text-decoration: none;
+  padding-bottom: .15rem; border-bottom: 2px solid transparent; }
+.sectionnav a:hover { color: var(--ink); }
+.sectionnav a[aria-current="true"] { color: var(--accent-ink);
+  border-bottom-color: var(--accent); }
+main [id] { scroll-margin-top: 3.6rem; }
 /* hub cards */
 .cards { display: grid; grid-template-columns:
   repeat(auto-fit, minmax(290px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
@@ -209,6 +224,7 @@ html.reveal .is-in { opacity: 1; transform: none; }
   <a href="https://github.com/ismayc/tracking-study">Code on GitHub</a>
   <button class="themebtn" type="button" aria-label="Toggle color theme">◐</button>
 </div></header>
+<nav class="sectionnav" aria-label="Sections"><div class="inner"><a href="#the-license-to-speak">The license to speak</a><a href="#the-trap">The trap</a><a href="#the-payoff">The payoff</a><a href="#the-modern-era">The modern era</a><a href="#the-boundary-and-the-lesson">The boundary, and the lesson</a><a href="#method-code-and-verification">Method</a></div></nav>
 <main>
 <div class="eyebrow">7.5M frames of raw SportVU</div>
 <h1>Seven and a half million frames, and the six-second trap hiding inside them</h1>
@@ -235,7 +251,7 @@ defused it.</p>
 <div class="sub">De-duplicated <abbr data-tip="The NBA's 2013-16 optical tracking system: x,y for all ten players (plus z for the ball) at 25 frames per second.">SportVU</abbr> frames across ten games, 25 per second.</div></div>
 </div>
 
-<div class="eyebrow beat">The license to speak</div>
+<div class="eyebrow beat" id="the-license-to-speak">The license to speak</div>
 
 <h2>First, the coordinates reproduce the league's own numbers</h2>
 <p>Start with the part that builds trust. Before asking the tracking data
@@ -245,7 +261,7 @@ raw coordinates, reproduces the league's published player-tracking
 aggregates. That check has to come first, because every claim downstream
 rides on the coordinates being what they say they are.</p>
 <figure class="figure-card"><iframe src="figures/fig1_distance_covered.html" loading="lazy" style="height:516px" title="Distance covered"></iframe><figcaption>Distance covered per game, recomputed from raw frames against the NBA's published aggregates. This figure earns the study its license to say anything else: if the reconstruction disagreed with the league's own numbers, nothing downstream would be worth reading.</figcaption></figure>
-<div class="eyebrow beat">The trap</div>
+<div class="eyebrow beat" id="the-trap">The trap</div>
 
 <h2>The scorer's clock lies, and it lies differently every game</h2>
 <p>The interesting work begins when tracking meets play-by-play, because
@@ -263,7 +279,7 @@ differs by game; an uncorrected join lands events inside the <em>next</em>
 possession. Calibrating the latency per game on shots only, then scoring
 turnovers as a held-out check, agreement rises to 97.6% on 1,622 shot
 events and 94.0% on the 232 held-out turnovers.</p>
-<div class="eyebrow beat">The payoff</div>
+<div class="eyebrow beat" id="the-payoff">The payoff</div>
 
 <h2>Spacing changes the shots taken, not the shooting</h2>
 <p>Here is why that matters beyond hygiene, and why the third figure is the
@@ -278,7 +294,7 @@ artifact of sampling the floor at the wrong moment</strong>. A junior analyst
 would have shipped it; a coaching staff might have acted on it.</p>
 <figure class="figure-card"><iframe src="figures/fig3_spacing_vs_efg.html" loading="lazy" style="height:516px" title="Spacing vs efg"></iframe><figcaption>Shooting efficiency by spacing quartile, measured at the calibrated moment of the shot. This is the study's cautionary centerpiece: the honest version is nearly flat, while the uncalibrated version of the same chart showed a strong clean gradient that was pure artifact. One figure, two joins, opposite conclusions: the argument for clock calibration in a single image.</figcaption></figure>
 <figure class="figure-card"><iframe src="figures/fig2_spacing_distribution.html" loading="lazy" style="height:516px" title="Spacing distribution"></iframe><figcaption>The distribution of team spacing across all frames: the raw material behind the quartile analysis, and the context for how much (or little) spacing actually varies possession to possession.</figcaption></figure>
-<div class="eyebrow beat">The modern era</div>
+<div class="eyebrow beat" id="the-modern-era">The modern era</div>
 
 <h2>Today's teams cover about 6% more ground</h2>
 <p>One more thing keeps the study connected to the present. The raw frames
@@ -289,7 +305,7 @@ thirteen seasons of official distance and speed, 2013-14 through
 the two tables together, and they agree to about one part in a hundred
 thousand, every season.</p>
 <figure class="figure-card"><iframe src="figures/fig4_modern_movement.html" loading="lazy" style="height:516px" title="Modern movement"></iframe><figcaption>How far a team runs per game, every season of the tracking era. This figure is what keeps a decade-old raw sample honest: today's teams cover about 6% more ground than in 2015-16, and 2025-26 is the fastest season on record by average speed. Any workload claim built on the raw frames needs this context, and now it is measured rather than assumed.</figcaption></figure>
-<div class="eyebrow beat">The boundary, and the lesson</div>
+<div class="eyebrow beat" id="the-boundary-and-the-lesson">The boundary, and the lesson</div>
 
 <h2>Ten games can't crown a conclusion. The discipline transfers anyway.</h2>
 <p>The study's honest boundary: ten games is a workload-and-methods sample,
@@ -306,7 +322,7 @@ The next study planned for this family builds on the modern
 broadcast-video datasets (SportsMOT, DeepSportRadar and kin):
 pseudo-tracking from footage, error-quantified against the real thing.
 The design is already written (README, section 8); the build is next.</p>
-<h2>Method, code, and verification</h2><p>The full technical write-up (data provenance, model specification, validation gates, and stated limitations) is the <a href="https://github.com/ismayc/tracking-study#readme">README</a>. The analysis is implemented independently in R and Python and reconciled to numeric tolerance; <code>run_checks.sh</code> replays every gate.</p>
+<h2 id="method-code-and-verification">Method, code, and verification</h2><p>The full technical write-up (data provenance, model specification, validation gates, and stated limitations) is the <a href="https://github.com/ismayc/tracking-study#readme">README</a>. The analysis is implemented independently in R and Python and reconciled to numeric tolerance; <code>run_checks.sh</code> replays every gate.</p>
 </main>
 <footer>Public data · dual-implementation reconciled · every gate scripted ·
 <a href="https://github.com/ismayc/basketball-data-science">the family on GitHub</a></footer>
@@ -364,6 +380,46 @@ The design is already written (README, section 8); the build is next.</p>
   }, {threshold: 0.08, rootMargin: "0px 0px -6% 0px"});
   Array.prototype.forEach.call(els, function (el) { io.observe(el); });
   window.__revealReady = true;
+})();
+</script>
+<script>
+(function () {
+  var nav = document.querySelector(".sectionnav");
+  if (!nav) { return; }
+  var links = Array.prototype.slice.call(nav.querySelectorAll("a"));
+  var row = nav.querySelector(".inner");
+  var targets = links.map(function (a) {
+    return document.getElementById(a.getAttribute("href").slice(1));
+  });
+  var last = null;
+  function update() {
+    var edge = nav.getBoundingClientRect().bottom + 24, cur = -1;
+    targets.forEach(function (t, i) {
+      if (t && t.getBoundingClientRect().top <= edge) { cur = i; }
+    });
+    // At the foot of the page the last sections are too short to reach the
+    // bar, so the final one counts as current there.
+    var de = document.documentElement;
+    if (window.scrollY + window.innerHeight >= de.scrollHeight - 2) { cur = targets.length - 1; }
+    if (cur === last) { return; }
+    last = cur;
+    links.forEach(function (a, i) {
+      if (i === cur) { a.setAttribute("aria-current", "true"); }
+      else { a.removeAttribute("aria-current"); }
+    });
+    var a = links[cur];
+    if (a && row) {
+      var l = a.offsetLeft, r = l + a.offsetWidth;
+      if (l < row.scrollLeft || r > row.scrollLeft + row.clientWidth) {
+        row.scrollLeft = Math.max(0, l - 16);
+      }
+    }
+  }
+  // Straight from the event, not via requestAnimationFrame, which stalls in
+  // background tabs and offscreen frames; eight rect reads per scroll is cheap.
+  window.addEventListener("scroll", update, {passive: true});
+  window.addEventListener("resize", update);
+  update();
 })();
 </script>
 </body>
