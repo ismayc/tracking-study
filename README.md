@@ -134,12 +134,14 @@ Across 167 player-games in 8 of the 10 games, for the 102 with 20+ live minutes:
 
 **Correction, October 19, 2026.** The first version of this finding used all
 10 games. A per-game check against the NBA's own tracking box score
-(`BoxScorePlayerTrackV3`) found two games whose players' distances ran short,
-and the frames show why: HOU at SAS and DET at IND are missing 13% to
+(`BoxScorePlayerTrackV3`) found two games whose players' summed distances ran
+13% to 21% short of the box score's, and the frames show why: HOU at SAS and DET at IND are missing 13% to
 22% of their game clock, up to 43 seconds at a period start. They
 are now left out of every workload number; they still count toward the frame
 totals, spacing, and the play-by-play join. `09_frame_coverage.py` gates every
 game on clock coverage, and `output/frame_coverage.csv` lists each period.
+`10_trackv3_check.py` gates every kept player-game against that box score
+(`output/trackv3_comparison.csv`, one row each, and `output/trackv3_games.csv`).
 
 ### B. Spacing: the offense occupies a median 529 sq ft
 

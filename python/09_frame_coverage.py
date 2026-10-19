@@ -56,7 +56,7 @@ START_GAP_MAX = 30.0
 
 # Games allowed to fail, each with the reason. Decided 2026-10-19 (option A):
 # both are dropped from the workload analysis only. Their players' distances
-# ran 13-21% short of the NBA's BoxScorePlayerTrackV3 for the same games.
+# ran short of the NBA's BoxScorePlayerTrackV3 for the same games (see 10_trackv3_check.py).
 WORKLOAD_EXCLUDED: dict[str, str] = {
     "01.02.2016.DET.at.IND": "33.5 s missing at a period start; workloads understated",
     "01.02.2016.HOU.at.SAS": "coverage 0.781, a period at 0.699; workloads understated",

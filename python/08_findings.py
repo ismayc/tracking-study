@@ -98,8 +98,11 @@ def excluded_numbers(w_all: pl.DataFrame) -> dict[str, str]:
     fc = pl.read_csv(OUT / "frame_coverage.csv").filter(pl.col("game").is_in(out))
     per_game = fc.group_by("game").agg(pl.col("distinct").sum() / pl.col("expected").sum())
     missing = (1 - per_game["distinct"]).sort()
+    tv = pl.read_csv(OUT / "trackv3_games.csv").filter(pl.col("game").is_in(out))
+    short = (1 - tv["dist_ratio"]).sort()
     return {"miss_lo": f"{missing[0]:.0%}", "miss_hi": f"{missing[-1]:.0%}",
-            "max_gap": f"{fc['start_gap'].max():.0f}"}
+            "max_gap": f"{fc['start_gap'].max():.0f}",
+            "short_lo": f"{short[0]:.0%}", "short_hi": f"{short[-1]:.0%}"}
 
 
 def findings_section() -> str:
@@ -138,12 +141,14 @@ Across {w.height} player-games in {n_kept} of the {n_all} games, for the {sub.he
 
 **Correction, October 19, 2026.** The first version of this finding used all
 {n_all} games. A per-game check against the NBA's own tracking box score
-(`BoxScorePlayerTrackV3`) found two games whose players' distances ran short,
-and the frames show why: HOU at SAS and DET at IND are missing {ex["miss_lo"]} to
+(`BoxScorePlayerTrackV3`) found two games whose players' summed distances ran
+{ex["short_lo"]} to {ex["short_hi"]} short of the box score's, and the frames show why: HOU at SAS and DET at IND are missing {ex["miss_lo"]} to
 {ex["miss_hi"]} of their game clock, up to {ex["max_gap"]} seconds at a period start. They
 are now left out of every workload number; they still count toward the frame
 totals, spacing, and the play-by-play join. `09_frame_coverage.py` gates every
 game on clock coverage, and `output/frame_coverage.csv` lists each period.
+`10_trackv3_check.py` gates every kept player-game against that box score
+(`output/trackv3_comparison.csv`, one row each, and `output/trackv3_games.csv`).
 
 ### B. Spacing: the offense occupies a median {med_hull} sq ft
 

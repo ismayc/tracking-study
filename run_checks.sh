@@ -18,6 +18,10 @@ echo "=== frame coverage: every game's tracking covers its clock ==="
 $PY python/09_frame_coverage.py --check | tail -1
 
 echo
+echo "=== tracking box score: per-player-game distance and minutes vs the NBA's BoxScorePlayerTrackV3 ==="
+$PY python/10_trackv3_check.py --check | tail -1
+
+echo
 echo "=== modern aggregates: cached-data gate replay ==="
 $PY python/07_modern_aggregates.py --check | tail -1
 
