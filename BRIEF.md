@@ -29,10 +29,12 @@ Clock-derived dt so distance counts live play only; 25 ft/s glitch filter;
 external validation against `LeagueDashPtStats` medians (2.02 vs 2.00 mi,
 leaving out the two games whose frames miss part of the clock; corrected
 October 19, 2026).
-New in this pass: a validated join to play-by-play. Pbp event clocks lag the
-tracking clock by a **per-game scorer latency of 2.5–6.0 s**; naive joining
-gives 67% possession-heuristic agreement (one game below coin-flip), and
-per-game calibration on shots with turnovers held out gives **97.6% / 94.0%**.
+New in this pass: a validated join to play-by-play. Pbp event clocks trail
+the tracking clock by **several seconds**; naive joining gives 67%
+possession-heuristic agreement (one game below coin-flip), one fixed 4 s
+offset gives 96.6%, and per-game calibration on shots with turnovers held out
+gives **97.6% / 94.0%**. The per-game offsets are loosely pinned, so they are
+not reported as measured latencies.
 The uncalibrated join also manufactures a strong spurious spacing→eFG
 gradient (42→53%); calibrated, the gradient is flat-ish with 3PA share rising
 in spacing. Caveats: 2015-16 data (nothing newer is public), 10 games,
@@ -43,7 +45,7 @@ convex-hull spacing only, no defender positioning.
 - We process raw NBA tracking data at scale and reproduce the league's own
   published numbers before reporting anything of our own.
 - Two silent data traps found and neutralized: 3× frame duplication, and a
-  2.5–6 s per-game clock misalignment that fabricates plausible-looking
+  several-second clock misalignment that fabricates plausible-looking
   findings if unhandled.
 - Possession detection from raw coordinates validated at 94–98% against
   play-by-play ground truth: the building block for possession-level

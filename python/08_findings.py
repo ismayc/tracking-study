@@ -12,9 +12,9 @@ for NAME in: scale, findings, validation, limitations, modern.
 Numbers that are properties of the source rather than computed results
 (25 Hz, 2015-16, season labels, camera counts, thresholds like the 25 ft/s
 glitch filter or the 2-second label window) stay literal prose. So do a few
-one-off diagnostics from the calibration sweep (the naive-join 67%/43%/24%
-agreement rates and the half-game robustness figures) that 06 prints but
-does not commit to output/.
+one-off diagnostics (the half-game robustness figures) that 06 prints but
+does not commit to output/. The naive-join and fixed-lead agreement rates
+come from 11_join_diagnostics.py's lead_pooled.csv and lead_bands.csv.
 
 The generator writes PLAIN text. <abbr> hover annotations inside the
 regions are owned by ../basketball-analysis-tools/glossary.py; run
@@ -74,10 +74,22 @@ def possession_numbers() -> dict[str, str]:
     p = pl.read_csv(OUT / "possession_validation.csv")
     fga_rate = p["fga_agree"].sum() / p["fga_checked"].sum()
     to_rate = p["to_agree"].sum() / p["to_checked"].sum()
+    # 11_join_diagnostics.py's sweep summaries (same window_label as 06)
+    pooled = pl.read_csv(OUT / "lead_pooled.csv")
+    bands = pl.read_csv(OUT / "lead_bands.csv")
+    naive = pooled.filter(pl.col("lead_s") == 1.0).row(0, named=True)
+    fixed = pooled.sort(["rate", "lead_s"], descending=[True, False]).row(0, named=True)
+    worst = bands.sort("same_clock_rate").row(0, named=True)
     return {
-        "lead_range": f"{p['calibrated_lead_s'].min():.1f}–"
+        "lead_range": f"{p['calibrated_lead_s'].min():.1f} to "
                       f"{p['calibrated_lead_s'].max():.1f}",
-        "worst_cal": f"{p['fga_rate'].min():.0%}",
+        "naive_rate": f"{naive['rate']:.0%}",
+        "naive_min": f"{naive['games_min_rate']:.0%}",
+        "fixed_lead": f"{fixed['lead_s']:g}",
+        "fixed_rate": f"{fixed['rate']:.1%}",
+        "worst_same": f"{worst['same_clock_rate']:.0%}",
+        "worst_best": f"{worst['best_rate']:.0%}",
+        "band_min": f"{bands['band_width_s'].min():g}",
         "fga_rate": f"{fga_rate:.1%}",
         "fga_n": f"{p['fga_checked'].sum():,}",
         "to_rate": f"{to_rate:.1%}",
@@ -172,20 +184,24 @@ contained the most instructive artifact in the study.
 **Validating the possession heuristic.** Play-by-play labels possession at
 discrete moments: the shooting team had the ball before every shot, the
 charged team before every turnover. Naively sampling the heuristic ~1s before
-each event's clock produced **67% agreement, and 43% in one game, worse than
-a coin flip.** The cause was not the heuristic: **play-by-play clocks lag the
-tracking clock by a per-game scorer latency of {pv["lead_range"]} seconds**, so a fixed
-small lead lands inside the *next* possession. Sweeping the lead made
-agreement climb from 24% to {pv["worst_cal"]} on the worst game. After calibrating the lead
-per game **on shots only**, then scoring **turnovers as a held-out check**:
+each event's clock produced **{pv["naive_rate"]} agreement, and {pv["naive_min"]} in one game, worse than
+a coin flip.** The cause was not the heuristic: **play-by-play clocks trail the
+tracking clock by several seconds**, so a small lead lands inside the *next*
+possession. Sweeping the lead made agreement climb from {pv["worst_same"]} to {pv["worst_best"]} on the
+worst game (`output/lead_sweep.csv`). One fixed lead of {pv["fixed_lead"]} s for every game
+reaches {pv["fixed_rate"]} on shots. Calibrating the lead per game **on shots only**,
+then scoring **turnovers as a held-out check**:
 
 | Check | Agreement |
 |---|---|
 | Shots (calibration metric) | **{pv["fga_rate"]}** ({pv["fga_n"]} events) |
 | Turnovers (held out) | **{pv["to_rate"]}** ({pv["to_n"]} events) |
 
-The heuristic is good; the naive join was broken. Per-game latencies are in
-`output/possession_validation.csv`.
+The heuristic is good; the naive join was broken. The per-game leads
+({pv["lead_range"]} s, in `output/possession_validation.csv`) are not precise measurements
+of each arena's delay: in every game, agreement stays within 2 points of its
+best across a band of leads at least {pv["band_min"]} s wide (`output/lead_bands.csv`), so
+per-game calibration adds about one point over the single fixed lead.
 
 Robustness of the constant-latency assumption: calibrating each half of each
 game separately moves the chosen lead by up to 2.5 s in a few games, but
@@ -198,7 +214,7 @@ spacing quartiles is nearly flat ({efg_list} from tightest
 to widest), while the three-point-attempt share rises monotonically
 ({share_lo} → {share_hi}): in this sample, spacing shapes the *shot profile* more than
 raw shot efficiency. The instructive part: **the uncalibrated join produced a
-strong, clean, monotone "wider = better shots" gradient (42% → 53%) that was
+strong "wider = better shots" gradient (42% → 53%) that was
 entirely an artifact of sampling spacing in the wrong window.** A junior
 analyst ships that chart; it survives review because it confirms what
 everyone already believes. `figures/fig3_spacing_vs_efg.png` shows the

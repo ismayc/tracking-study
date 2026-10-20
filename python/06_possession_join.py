@@ -15,12 +15,15 @@ Two things the study's own README named as its next steps (limitations 3 & 5):
    This is the question spacing exists to answer, and it needs the join.
 
 Timing convention - the part that turned out to matter: play-by-play event
-clocks lag the tracking clock by a per-game amount (scorer latency; up to
-~5 s in the worst of the ten games). Sampling the heuristic at a fixed small
-lead before the event clock therefore lands INSIDE the next possession for
-high-latency games and agreement collapses - diagnosed by sweeping the lead
-and watching agreement climb from 24% to 96% on the worst game. The fix is a
-per-game CALIBRATION: choose the lead that maximizes agreement on shots, then
+clocks trail the tracking clock by several seconds. Sampling the heuristic at
+a small lead before the event clock therefore lands INSIDE the next
+possession and agreement collapses - diagnosed by sweeping the lead and
+watching agreement climb from 24% to 97% on the worst game
+(11_join_diagnostics.py commits the sweep). One fixed lead of about 4 s
+already recovers most of it; agreement is near its best over a broad band of
+leads in every game, so the per-game lead is not a precise latency. The
+study still uses a per-game CALIBRATION: choose the lead that maximizes
+agreement on shots, then
 report agreement on TURNOVERS at that same lead as the held-out check (nothing
 about turnovers was used to pick the lead). Pbp clocks have 1-second
 resolution; tracking has 0.01 s.
@@ -83,14 +86,23 @@ def load_pbp(path: Path) -> pl.DataFrame:
 
 def window_label(poss: pl.DataFrame, period: int, clock: float,
                  lead: float) -> int | None:
-    """Majority possession label in [clock+lead, clock+lead+LOOKBACK_S]."""
+    """Majority possession label in [clock+lead, clock+lead+LOOKBACK_S].
+
+    A window split evenly between the teams has no majority and gets no
+    label, like a window with too few frames. Until October 20, 2026 a tie
+    went to whichever team polars' group_by listed first, which varies run
+    to run, so the published agreement rates and chosen leads were not
+    reproducible."""
     lo, hi = clock + lead, clock + lead + LOOKBACK_S
     win = poss.filter((pl.col("period") == period)
                       & (pl.col("game_clock") >= lo)
                       & (pl.col("game_clock") <= hi))
     if win.height < MIN_FRAMES:
         return None
-    counts = win.group_by("off_team_id").agg(n=pl.len()).sort("n", descending=True)
+    counts = win.group_by("off_team_id").agg(n=pl.len()).sort(
+        ["n", "off_team_id"], descending=[True, False])
+    if counts.height > 1 and counts["n"][0] == counts["n"][1]:
+        return None
     return int(counts["off_team_id"][0])
 
 

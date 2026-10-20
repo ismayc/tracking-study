@@ -166,19 +166,23 @@ contained the most instructive artifact in the study.
 discrete moments: the shooting team had the ball before every shot, the
 charged team before every turnover. Naively sampling the heuristic ~1s before
 each event's clock produced **67% agreement, and 43% in one game, worse than
-a coin flip.** The cause was not the heuristic: **play-by-play clocks lag the
-tracking clock by a per-game scorer latency of 2.5–6.0 seconds**, so a fixed
-small lead lands inside the *next* possession. Sweeping the lead made
-agreement climb from 24% to 96% on the worst game. After calibrating the lead
-per game **on shots only**, then scoring **turnovers as a held-out check**:
+a coin flip.** The cause was not the heuristic: **play-by-play clocks trail the
+tracking clock by several seconds**, so a small lead lands inside the *next*
+possession. Sweeping the lead made agreement climb from 24% to 97% on the
+worst game (`output/lead_sweep.csv`). One fixed lead of 4 s for every game
+reaches 96.6% on shots. Calibrating the lead per game **on shots only**,
+then scoring **turnovers as a held-out check**:
 
 | Check | Agreement |
 |---|---|
-| Shots (calibration metric) | **97.6%** (1,622 events) |
+| Shots (calibration metric) | **97.6%** (1,621 events) |
 | Turnovers (held out) | **94.0%** (232 events) |
 
-The heuristic is good; the naive join was broken. Per-game latencies are in
-`output/possession_validation.csv`.
+The heuristic is good; the naive join was broken. The per-game leads
+(2.5 to 6.0 s, in `output/possession_validation.csv`) are not precise measurements
+of each arena's delay: in every game, agreement stays within 2 points of its
+best across a band of leads at least 1.5 s wide (`output/lead_bands.csv`), so
+per-game calibration adds about one point over the single fixed lead.
 
 Robustness of the constant-latency assumption: calibrating each half of each
 game separately moves the chosen lead by up to 2.5 s in a few games, but
@@ -191,7 +195,7 @@ spacing quartiles is nearly flat (50.0% / 45.0% / 45.7% / 47.2% from tightest
 to widest), while the three-point-attempt share rises monotonically
 (23.5% → 29.8%): in this sample, spacing shapes the *shot profile* more than
 raw shot efficiency. The instructive part: **the uncalibrated join produced a
-strong, clean, monotone "wider = better shots" gradient (42% → 53%) that was
+strong "wider = better shots" gradient (42% → 53%) that was
 entirely an artifact of sampling spacing in the wrong window.** A junior
 analyst ships that chart; it survives review because it confirms what
 everyone already believes. `figures/fig3_spacing_vs_efg.png` shows the

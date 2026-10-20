@@ -8,6 +8,9 @@ show it and every number quoted about it is read from a committed table:
       shot agreement at every lead on 06's grid, per game. The best lead
       per game reproduces 06's calibrated_lead_s (the --check gate).
   output/spacing_efg_quartiles_naive.csv
+  output/lead_pooled.csv, output/lead_bands.csv
+      pooled agreement at each lead, and each game's best lead with the
+      band of leads within 2 points of it
       eFG% by spacing quartile with spacing sampled at the naive fixed lead
       (NAIVE_LEAD, the "about 1 s before each event's clock" join the README
       describes), the same computation 06 runs at the calibrated lead.
@@ -116,28 +119,60 @@ def window_counts(poss: pl.DataFrame, period: int, clock: float,
 
 
 def label(poss, period, clock, lead) -> int | None:
-    """06's window_label with ties broken by team id. 06 sorts on the count
-    alone, so a window split evenly between the teams gets whichever team
-    polars' group_by returns first, which varies run to run; this copy is
-    deterministic so the committed sweep reproduces."""
-    c = window_counts(poss, period, clock, lead)
-    return None if c is None else int(c["off_team_id"][0])
+    """06's own label: the window's strict majority, none on an even split."""
+    return j.window_label(poss, period, clock, lead)
 
 
 def sweep_point(poss, pbp, lead) -> tuple[int, int, int]:
     """Shots checked, shots agreeing, and windows split evenly between the
-    teams (where 06's own label is a coin flip) at one lead."""
+    teams (left unlabeled by 06, so not checked) at one lead. Uses 06's
+    window_label, so the sweep at 06's chosen lead reproduces 06 exactly."""
     n = agree = tied = 0
     for ev in pbp.filter(pl.col("is_fga")).iter_rows(named=True):
         if ev["team_id"] == 0:
             continue
-        c = window_counts(poss, ev["period"], ev["secs_left"], lead)
-        if c is None:
+        lab = j.window_label(poss, ev["period"], ev["secs_left"], lead)
+        if lab is None:
+            c = window_counts(poss, ev["period"], ev["secs_left"], lead)
+            tied += c is not None
             continue
         n += 1
-        agree += int(c["off_team_id"][0]) == ev["team_id"]
-        tied += c.height > 1 and c["n"][0] == c["n"][1]
+        agree += lab == ev["team_id"]
     return n, agree, tied
+
+
+NEAR_BEST = 0.02   # a lead is "near best" within 2 points of a game's best rate
+
+
+def lead_summaries(sw: pl.DataFrame) -> tuple[pl.DataFrame, pl.DataFrame]:
+    """From the sweep: pooled shot agreement at each lead (one offset for
+    every game), and each game's best lead with the band of leads whose
+    agreement is within NEAR_BEST of that best. The band shows how loosely
+    the data pin a game's offset: the chosen lead is the top of a broad
+    stretch, not a measured scorer latency."""
+    pooled = (sw.group_by("lead_s")
+              .agg(shots_checked=pl.col("shots_checked").sum(),
+                   shots_agree=pl.col("shots_agree").sum(),
+                   games_min_rate=pl.col("rate").min(),
+                   games_max_rate=pl.col("rate").max())
+              .with_columns(rate=pl.col("shots_agree") / pl.col("shots_checked"))
+              .sort(["rate", "lead_s"], descending=[True, False])
+              .with_row_index("rate_rank", offset=1)   # 1 = best single lead
+              .sort("lead_s"))
+    best = (sw.sort(["game", "rate", "lead_s"], descending=[False, True, False])
+            .group_by("game", maintain_order=True).first()
+            .select("game", best_lead_s="lead_s", best_rate="rate"))
+    same_clock = sw.filter(pl.col("lead_s") == 0.0).select("game", same_clock_rate="rate")
+    bands = (sw.join(best, on="game")
+             .filter(pl.col("rate") >= pl.col("best_rate") - NEAR_BEST)
+             .group_by("game")
+             .agg(band_lo_s=pl.col("lead_s").min(), band_hi_s=pl.col("lead_s").max())
+             .join(best, on="game").join(same_clock, on="game")
+             .with_columns(band_width_s=pl.col("band_hi_s") - pl.col("band_lo_s"))
+             .select("game", "same_clock_rate", "best_lead_s", "best_rate",
+                     "band_lo_s", "band_hi_s", "band_width_s")
+             .sort("game"))
+    return pooled, bands
 
 
 def pick_example(mom, pbp, poss, lead):
@@ -287,6 +322,9 @@ def compute() -> int:
         cache[g] = (mom, pbp, poss, hulls)
     sw = pl.DataFrame(sweep)
     sw.write_csv(OUT / "lead_sweep.csv")
+    pooled, bands = lead_summaries(sw)
+    pooled.write_csv(OUT / "lead_pooled.csv")
+    bands.write_csv(OUT / "lead_bands.csv")
     naive = quartiles(pl.DataFrame(naive_rows))
     naive.write_csv(OUT / "spacing_efg_quartiles_naive.csv")
 
@@ -312,22 +350,23 @@ def check() -> int:
     best = (sw.sort(["game", "rate", "lead_s"], descending=[False, True, False])
             .group_by("game", maintain_order=True).first())
     m = best.join(val, on="game", how="full", coalesce=True)
-    # 06 breaks a window split evenly between the teams arbitrarily (see
-    # label()), so its counts can differ from this sweep's by at most the
-    # number of such windows, and its chosen lead must be best up to them.
+    # Both use 06's window_label, so at 06's chosen lead the counts match
+    # exactly, and that lead is the sweep's best (first maximum, as 06's
+    # calibrate_lead keeps the smallest lead among equal rates).
     for r in m.iter_rows(named=True):
         at = sw.filter((pl.col("game") == r["game"])
                        & (pl.col("lead_s") == r["calibrated_lead_s"])).row(0, named=True)
-        if at["shots_checked"] != r["fga_checked"]:
-            fails.append(f"{r['game']}: shots checked at 06's lead differ")
-        if abs(at["shots_agree"] - r["fga_agree"]) > at["tied_windows"]:
-            fails.append(f"{r['game']}: agreement at 06's lead differs by more than "
-                         f"its {at['tied_windows']} evenly split windows")
-        best_lo = (r["shots_agree"] - r["tied_windows"]) / r["shots_checked"]
-        at_hi = (at["shots_agree"] + at["tied_windows"]) / at["shots_checked"]
-        if best_lo > at_hi:
-            fails.append(f"{r['game']}: 06's lead {r['calibrated_lead_s']} is not "
-                         f"the best up to evenly split windows")
+        if (at["shots_checked"], at["shots_agree"]) != (r["fga_checked"], r["fga_agree"]):
+            fails.append(f"{r['game']}: sweep at 06's lead {r['calibrated_lead_s']} gives "
+                         f"{at['shots_agree']}/{at['shots_checked']}, 06 has "
+                         f"{r['fga_agree']}/{r['fga_checked']}")
+        if r["lead_s"] != r["calibrated_lead_s"]:
+            fails.append(f"{r['game']}: sweep's best lead {r['lead_s']} is not 06's "
+                         f"{r['calibrated_lead_s']}")
+    pooled, bands = lead_summaries(sw)
+    for name, df in (("lead_pooled.csv", pooled), ("lead_bands.csv", bands)):
+        if not df.equals(pl.read_csv(OUT / name)):
+            fails.append(f"{name} does not rebuild from lead_sweep.csv")
     if sorted(sw["lead_s"].unique().to_list()) != j.LEAD_GRID:
         fails.append("sweep leads differ from 06's LEAD_GRID")
     naive = pl.read_csv(OUT / "spacing_efg_quartiles_naive.csv")
@@ -351,8 +390,8 @@ def check() -> int:
     for f in fails:
         print("FAIL", f)
     print("JOIN DIAGNOSTICS", "FAILED" if fails else
-          f"PASSED: 06's lead is the sweep's best in all {best.height} games, up to "
-          f"evenly split windows; examples consistent")
+          f"PASSED: 06's lead is the sweep's best in all {best.height} games and its "
+          f"counts match exactly; examples consistent")
     return 1 if fails else 0
 
 

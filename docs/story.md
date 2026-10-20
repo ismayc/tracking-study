@@ -1,4 +1,4 @@
-# Seven and a half million frames, and the six-second trap hiding inside them
+# Seven and a half million frames, and the clock trap hiding inside them
 
 Optical tracking is the richest basketball data there is: x and y for all
 ten players (and z for the ball), twenty-five times a second. It is also
@@ -10,11 +10,11 @@ defused it.
 
 <div class="tiles">
 <div class="tile"><div class="label">Scorer's-table lag</div>
-<div class="value">2.5&ndash;6.0<small> s</small></div>
-<div class="sub">How far play-by-play clocks trail the tracking clock, varying game by game.</div></div>
+<div class="value">4<small> s</small></div>
+<div class="sub">One offset for every game: shifting the join 4 seconds earlier lifts agreement to 96.6%.</div></div>
 <div class="tile"><div class="label">Join agreement</div>
 <div class="value">24% &rarr; 97.6%</div>
-<div class="sub">Worst-game naive join versus the calibrated join on 1,622 shot events.</div></div>
+<div class="sub">Worst-game naive join versus the calibrated join on 1,621 shot events.</div></div>
 <div class="tile"><div class="label">The phantom gradient</div>
 <div class="value">42% &rarr; 53%</div>
 <div class="sub">The clean spacing-helps-shooting story the uncalibrated join invents. The honest chart is nearly flat.</div></div>
@@ -56,14 +56,18 @@ coin flip, on a binary label.
 
 {{svg:dg1_one_shot|One real made three, from the game whose same-clock join agrees least. The ball is at the top of its arc well before the play-by-play logs the shot, and by the stamp the other team has the ball. A window placed at the stamp, or one second before it, names the wrong team; the window this game's calibration chose sits inside the shooting team's possession.}}
 
-The cause was not the heuristic. **Play-by-play clocks lag the tracking
-clock by a per-game scorer latency of 2.5 to 6.0 seconds**: a human at
-the scorer's table, typing at human speed, in different arenas with
-different reflexes. A fixed correction cannot fix it because the lag
-differs by game; an uncorrected join lands events inside the *next*
-possession. Calibrating the latency per game on shots only, then scoring
-turnovers as a held-out check, agreement rises to 97.6% on 1,622 shot
-events and 94.0% on the 232 held-out turnovers.
+The cause was not the heuristic. **Play-by-play clocks trail the tracking
+clock by several seconds**: a human at the scorer's table logs each event
+after it happens, so an uncorrected join lands events inside the *next*
+possession. Moving the join earlier fixes it. One offset of 4 seconds for
+every game lifts shot agreement to 96.6%. Choosing each game's best offset
+on shots only, then scoring turnovers as a held-out check, reaches 97.6% on
+1,621 shot events and 94.0% on the 232 held-out turnovers.
+
+Those per-game offsets, 2.5 to 6.0 seconds, are not precise measurements of
+each arena's delay. In every game, agreement stays within 2 points of its
+best across a band of offsets at least 1.5 seconds wide, so the chosen
+offset is the top of a broad stretch, not a sharp peak.
 
 {{svg:dg2_lead_sweep|Shot agreement for every game as the window moves earlier, half a second at a time. At the stamp, agreement is below half in every game. It climbs steeply, then levels off, so each game's chosen lead (dots) is the highest point of a broad, nearly flat stretch rather than a sharp peak.}}
 
@@ -77,8 +81,8 @@ across floor-spacing quartiles is nearly flat (50.0%, 45.0%, 45.7%, 47.2%
 from tightest to widest), while the share of threes rises steadily (23.5%
 to 29.8%). In this sample, spacing changes *what shots are taken* more than
 it changes raw efficiency. But run the same analysis with the naive,
-uncalibrated join and you get a clean, monotone, publication-ready
-"wider spacing = better shooting" gradient from 42% to 53%: **entirely an
+uncalibrated join and you get a publication-ready "wider spacing = better
+shooting" rise from 42% to 53%: **entirely an
 artifact of sampling the floor at the wrong moment**. A junior analyst
 would have shipped it; a coaching staff might have acted on it.
 
@@ -86,7 +90,7 @@ Spacing here is one measured quantity: the floor area the five attackers enclose
 
 {{svg:dg3_spacing_court|What the spacing number measures, on two real frames from the same game: the area inside a band stretched around the five players on offense. The left frame sits near the average of the tightest quarter of shots, the right one near the widest quarter.}}
 
-{{fig:fig3_spacing_vs_efg|Shooting efficiency by spacing quartile, with spacing measured two ways. Blue: the calibrated join, nearly flat. Grey: the naive join, which samples the floor one second before the logged clock and shows a clean rise from 42% to 53% that is an artifact. One figure, two joins, opposite conclusions: the argument for clock calibration in a single image.}}
+{{fig:fig3_spacing_vs_efg|Shooting efficiency by spacing quartile, with spacing measured two ways. Blue: the calibrated join, nearly flat. Gray: the naive join, which samples the floor one second before the logged clock and shows a rise from 42% to 53% that is an artifact. One figure, two joins, opposite conclusions: the argument for clock calibration in a single image.}}
 
 {{fig:fig2_spacing_distribution|The distribution of team spacing across all frames: the raw material behind the quartile analysis, and the context for how much (or little) spacing actually varies possession to possession.}}
 
