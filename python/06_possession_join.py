@@ -28,7 +28,8 @@ resolution; tracking has 0.01 s.
 Inputs : data/moments/*.parquet, data/pbp/*.parquet
 Outputs: output/possession_validation.csv
          output/spacing_at_shot.csv, output/spacing_efg_quartiles.csv
-         figures/fig3_spacing_vs_efg.{png,html}
+         (figures/fig3_spacing_vs_efg is drawn by 11_join_diagnostics.py,
+         beside the naive join it is contrasted with)
 
 Run: python python/06_possession_join.py
 """
@@ -38,7 +39,6 @@ import importlib.util
 from pathlib import Path
 
 import numpy as np
-import plotly.graph_objects as go
 import polars as pl
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -224,25 +224,7 @@ def main() -> int:
         print(f"  {r['quartile']:14s} mean {r['mean_hull']:5.0f} sq ft: "
               f"eFG% {r['efg']:.3f}, 3PA share {r['share_3pt']:.1%} (n={r['n']:,})")
 
-    fig = go.Figure(layout=_a3.base_layout(
-        "Spacing right before the shot barely moves eFG%",
-        f"eFG% by offensive spacing quartile in the ~2s before the shot "
-        f"(latency-calibrated join) · {shots.height:,} shots, 10 games, 2015-16 · "
-        f"the naive uncalibrated join shows a strong gradient that is an artifact",
-        "Offensive convex-hull area before the shot (quartiles)", "Effective FG%"))
-    fig.add_trace(go.Bar(
-        x=[f"{r['quartile']}<br>{r['mean_hull']:.0f} sq ft"
-           for r in by_q.iter_rows(named=True)],
-        y=by_q["efg"].to_list(),
-        marker=dict(color=BLUE, line=dict(width=0)),
-        text=[f"{v:.1%}" for v in by_q["efg"]],
-        textposition="outside", textfont=dict(color=MUTED, size=11),
-        hovertemplate="%{x}: eFG %{y:.3f}<extra></extra>"))
-    fig.update_yaxes(tickformat=".0%",
-                     range=[0, float(by_q["efg"].max()) * 1.25])
-    _a3.save(fig, "fig3_spacing_vs_efg")
-
-    print(f"\nWrote {OUT} and {FIG}")
+    print(f"\nWrote {OUT}")
     return 0
 
 

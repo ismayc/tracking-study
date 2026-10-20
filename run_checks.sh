@@ -28,3 +28,11 @@ $PY python/07_modern_aggregates.py --check | tail -1
 echo
 echo "=== findings: README numbers regenerate from outputs ==="
 $PY python/08_findings.py --check | tail -1
+
+echo
+echo "=== join diagnostics: lead sweep agrees with the calibrated leads ==="
+$PY python/11_join_diagnostics.py --check | tail -1
+
+echo
+echo "=== diagrams: committed SVGs rebuild from outputs ==="
+$PY python/12_diagrams.py --check | tail -1
