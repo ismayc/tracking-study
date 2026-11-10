@@ -196,13 +196,16 @@ details.terms summary { padding: .55rem .9rem; cursor: pointer;
   color: var(--ink-2); font-weight: 600; }
 details.terms ul { margin: 0; padding: .2rem 1.4rem .8rem; }
 details.terms li { margin: .3rem 0; color: var(--ink-2); }
-/* sticky section nav (study pages): the masthead scrolls away, this stays */
+/* sticky section nav (study pages and the hub): the masthead scrolls away,
+   this stays. It wraps on a desktop and scrolls sideways on a phone. */
 .sectionnav { position: sticky; top: 0; z-index: 30; background: var(--surface);
   border-bottom: 1px solid var(--rule); }
 .sectionnav .inner { width: min(1200px, 94vw); margin: 0 auto; display: flex;
   gap: 1.3rem; overflow-x: auto; white-space: nowrap; scrollbar-width: none;
   padding: .55rem 0 .45rem; }
 .sectionnav .inner::-webkit-scrollbar { display: none; }
+@media (min-width: 768px) { .sectionnav .inner { flex-wrap: wrap;
+  row-gap: .25rem; } }
 .sectionnav a { font-family: "Barlow Condensed", system-ui, sans-serif;
   font-weight: 500; font-size: .95rem; letter-spacing: .1em;
   text-transform: uppercase; color: var(--ink-3); text-decoration: none;
@@ -210,7 +213,7 @@ details.terms li { margin: .3rem 0; color: var(--ink-2); }
 .sectionnav a:hover { color: var(--ink); }
 .sectionnav a[aria-current="true"] { color: var(--accent-ink);
   border-bottom-color: var(--accent); }
-main [id] { scroll-margin-top: 3.6rem; }
+main [id] { scroll-margin-top: calc(var(--nav-h, 2.9rem) + .7rem); }
 /* hub cards */
 .cards { display: grid; grid-template-columns:
   repeat(auto-fit, minmax(290px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
@@ -254,8 +257,6 @@ html.reveal .is-in { opacity: 1; transform: none; }
 <header class="masthead"><div class="inner">
   <a class="family" href="https://ismayc.github.io/basketball-data-science/">Basketball Data Science</a>
   <span class="spacer"></span>
-  <a href="https://ismayc.github.io/basketball-data-science/">All studies</a>
-  <a href="https://ismayc.github.io/nba-scouting-onepagers/">Scouting one-pagers</a>
   <a href="https://github.com/ismayc/tracking-study">Code on GitHub</a>
   <button class="themebtn" type="button" aria-label="Toggle color theme">◐</button>
 </div></header>
@@ -452,6 +453,11 @@ The design is already written (README, section 8); the build is next.</p>
     return document.getElementById(a.getAttribute("href").slice(1));
   });
   var last = null;
+  // A wrapped nav is taller, so a jump must clear its measured height.
+  function measure() {
+    document.documentElement.style.setProperty(
+      "--nav-h", nav.getBoundingClientRect().height + "px");
+  }
   function update() {
     var edge = nav.getBoundingClientRect().bottom + 24, cur = -1;
     targets.forEach(function (t, i) {
@@ -478,7 +484,8 @@ The design is already written (README, section 8); the build is next.</p>
   // Straight from the event, not via requestAnimationFrame, which stalls in
   // background tabs and offscreen frames; eight rect reads per scroll is cheap.
   window.addEventListener("scroll", update, {passive: true});
-  window.addEventListener("resize", update);
+  window.addEventListener("resize", function () { measure(); update(); });
+  measure();
   update();
 })();
 </script>

@@ -1154,6 +1154,12 @@ body.fam-dark .seasonlab{color:#f5f3ec}</style><meta charset="utf-8" /></head>
     function attachHover(node, tr, i, xv, yv, horiz) {
       if (tr.hoverinfo === "skip") return;
       node.addEventListener("pointermove", function (e) {
+        /* Mark the event so the chart-level nearest-line search below
+         * leaves this point's own tooltip in place. Without the mark, a
+         * reference line through a scatter cloud took over the tooltip of
+         * nearly every point near it (1,944 of 2,004 on the kills study's
+         * kill-vs-stop chart, November 10, 2026). */
+        e.famplotPoint = true;
         showTip(e, horiz ? hover(tr, i, xv, yv) : hover(tr, i, xv, yv));
       });
       node.addEventListener("pointerleave", hideTip);
@@ -1165,6 +1171,7 @@ body.fam-dark .seasonlab{color:#f5f3ec}</style><meta charset="utf-8" /></head>
     postHeight();
     if (linePts.length) {
       svg.addEventListener("pointermove", function (e) {
+        if (e.famplotPoint) return;
         var rect = svg.getBoundingClientRect();
         var sx = (e.clientX - rect.left) * W / rect.width;
         var sy = (e.clientY - rect.top) * H / rect.height;
